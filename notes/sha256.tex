@@ -1,0 +1,125 @@
+\documentclass{report}
+
+%%%%%%%%%Packages Start%%%%%%%%%
+%%Basic packages
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{enumerate}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{datetime}
+%\usepackage{datetime2}
+
+%%Code Packages
+%\usepackage{color}
+%\usepackage{xcolor}
+%\usepackage{listings}
+%\usepackage{minted}
+%\usepackage{attachfile}
+%\usepackage{accsupp}
+%\usepackage{verbatim}
+%\usepackage[misc]{ifsym}
+
+% math
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+% graphics
+\usepackage{float}
+%\usepackage{tikz}
+%\usepackage{graphicx}
+%\usepackage{pgfplot}
+%\usepackage{fancyhdr}
+%%%%%%%%%Packages End%%%%%%%%%%%
+
+\author{Mimanshu Maheshwari}
+\title{\textbf{SHA Hashing Notes}}
+\date{\today, \currenttime} 
+
+
+\begin{document}
+\maketitle
+\tableofcontents
+\listoftables
+
+\chapter{SHA 256}
+\section{Introduction}
+SHA256 is a 256 bits hash. Ment to provide 128 bits of security against collision attack. 
+\section{Implementation}
+SHA256 operates in a manner of MD4, MD5 and SHA-1. 
+The message to be hashed is 
+\begin{enumerate}
+
+	\item{Padded with its length in such a way that the result is multiple of 512 bits long.}
+	\item{Parsed into 512 bits message blocks $M^{1}, M^{1}, \ldots, M^{1},$}
+	\item{Message blocks are processed one block at a time: Beginning with a fixed initial hash value	$H^{(0)}$, sequentially compute}
+		\[ H^{(i)} = H^{(i-1)} + C_{M^{(i)}}(H^{(i-1)}) \]
+		where $C$ is the SHA-256 \textit{compression function} and $+$ means word-wise $\mod 2^{32}$ addition. $H^{(N)}$ is the \textit{\textbf{hash}} of $M$.
+\end{enumerate}
+
+SHA-256 operates on 512-bits \textit{message block} and a 256-bits \textit{intermidiate hash value}. 
+It essentially is a 256-bit cypher algorithm which encripts intermidiate hash value using the message block as key. 
+Hence, their are two main components: 
+\begin{itemize}
+	\item{Compression Function}
+	\item{message schedule}
+\end{itemize}
+
+\begin{center}
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|| c | c ||}
+			\hline 
+			\textbf{Notation} & \textbf{Meaning} \\ 
+			\hline 
+			$\oplus$ & Bitwise XOR \\
+			\hline 
+			$\vee$ & Bitwise AND \\ 
+			\hline 
+			$\wedge$ & Bitwise OR \\
+			\hline 
+			$\neg$ & Bitwise Complement\\ 
+			\hline 
+			$+$ & $\mod 2^{32}$ addition \\
+			\hline 
+			$R^{n}$ & right shift by \textit{n} bits\\
+			\hline 
+			$S^{n}$ & right rotate by \textit{n} bits\\
+			\hline
+		\end{tabular}
+		\caption{Notation Reference}
+		\label{notation-reference}
+	\end{table}
+\end{center}
+
+All of the operators in \ref{notation-reference} table act on 32-bit words.
+
+The initial value of $H^{(0)}$ is the following sequence of 32 bit words (which are obtained by taking the fractional parts of the square roots of the first eight primes.)
+
+\begin{align}
+	H_{1}^{(0)} &= 6a09e667 \\
+	H_{2}^{(0)} &= bb67ae85 \\
+	H_{3}^{(0)} &= 3c6ef372 \\
+	H_{4}^{(0)} &= a54ff53a \\
+	H_{5}^{(0)} &= 510e527f \\
+	H_{6}^{(0)} &= 9b05688c \\
+	H_{7}^{(0)} &= 1f83d9ab \\
+	H_{8}^{(0)} &= 5be0cd19
+\end{align}
+
+\section{Preprocessing}
+Computing the hash of message begins by padding the message: 
+\begin{enumerate}
+	\item{Pad the message in usual way:}
+		Suppose the lenght of message $M$, in bits, is $l$. Append the bit $"1"$ to the end of message, and the the $k$ zero bits, where $k$ is the smallest non-negative solution to the equation $l + 1 + 1 \equiv 448 \mod 512$. To this append the 64-bit block which is equal to the number $l$ written in binary. For example, the (8-bit ASCII) message "abc" has length $8 \cdot 3 = 24$ so it is padded with a one, then $448 - (24 + 1) = 423$ zero bits, and thenthe length to become the 512-bit padded message: 
+		\[ 01100001 01100010 01100011 \underbrace{00\ldots0}_{423-bits} \overbrace{00\ldots011000}^{64-bits} \]
+\end{enumerate}
+
+\appendix
+\end{document}
+% https://tex.stackexchange.com/a/44838
+% https://www.overleaf.com/learn/latex/Mathematical_expressions
+% https://www.overleaf.com/learn/latex/Tables
+% https://mirror.niser.ac.in/ctan/obsolete/info/math/voss/mathmode/Mathmode.pdf
