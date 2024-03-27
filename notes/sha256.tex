@@ -114,7 +114,8 @@ Computing the hash of message begins by padding the message:
 \begin{enumerate}
 	\item{Pad the message in usual way:}
 		Suppose the lenght of message $M$, in bits, is $l$. Append the bit $"1"$ to the end of message, and the the $k$ zero bits, where $k$ is the smallest non-negative solution to the equation $l + 1 + 1 \equiv 448 \mod 512$. To this append the 64-bit block which is equal to the number $l$ written in binary. For example, the (8-bit ASCII) message "abc" has length $8 \cdot 3 = 24$ so it is padded with a one, then $448 - (24 + 1) = 423$ zero bits, and thenthe length to become the 512-bit padded message: 
-		\[ 01100001 01100010 01100011 \underbrace{00\ldots0}_{423-bits} \overbrace{00\ldots011000}^{64-bits} \]
+		\[ 01100001\ \ 01100010\ \ 01100011\ \ \underbrace{0000\ldots0}_{423-bits}\ \ \overbrace{00\ldots011000}^{64-bits} \]
+		The length of the padded message should now be 512 bits.
 \end{enumerate}
 
 \appendix
