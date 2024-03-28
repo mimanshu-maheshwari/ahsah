@@ -1,4 +1,3 @@
-
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 512usize;
 /// Message buffer size in bytes
@@ -22,7 +21,6 @@ pub fn hash(msg: &[u8]) -> Option<()> {
         return None;
     }
     println!("INFO: Recived message of length: {msg_len}");
-
 
     const _H: [u32; HASH_SIZE_U32] = [
         0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
@@ -49,9 +47,11 @@ pub fn hash(msg: &[u8]) -> Option<()> {
         temp_block_buf.push(*i);
     }
 
-    println!("INFO: created a temporary buffer of len: {}", temp_block_buf.len());
+    println!(
+        "INFO: created a temporary buffer of len: {}",
+        temp_block_buf.len()
+    );
     // read message data into temporary buffer.
-
 
     /* padding message start */
     // length of message in bits.
@@ -91,7 +91,6 @@ pub fn hash(msg: &[u8]) -> Option<()> {
         println!("");
     }
 
-
     Some(())
 }
 
@@ -104,11 +103,11 @@ fn copy_buf_u8_to_u32(u8_block: &[u8], u32_block: &mut [u32; BUFFER_SIZE_U32], s
         "Remaining bits in buffer are {val}, Expected {BUFFER_SIZE_U8} bits",
         val = (u8_block.len() - start)
     );
-    for i in start..BUFFER_SIZE_U32 {
-        u32_block[i] = (u8_block[i * 4 + 0] as u32) << 24
-            | (u8_block[i * 4 + 1] as u32) << 16
-            | (u8_block[i * 4 + 2] as u32) << 8
-            | (u8_block[i * 4 + 3]) as u32;
+    for i in 0..BUFFER_SIZE_U32 {
+        u32_block[i] = (u8_block[start + (i * 4) + 0] as u32) << 24
+            | (u8_block[start + (i * 4) + 1] as u32) << 16
+            | (u8_block[start + (i * 4) + 2] as u32) << 8
+            | (u8_block[start + (i * 4) + 3]) as u32;
     }
 }
 
@@ -116,9 +115,9 @@ fn copy_buf_u8_to_u32(u8_block: &[u8], u32_block: &mut [u32; BUFFER_SIZE_U32], s
 /// (L + 1 + k + 64) mod 512 = 0
 fn k_value(l: usize, one_bit: Option<usize>) -> usize {
     let padding_size = LENGTH_VALUE_PADDING_SIZE_BITS;
-    let buffer_size  = BUFFER_SIZE_BITS ;
+    let buffer_size = BUFFER_SIZE_BITS;
     match one_bit {
-        None    => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
+        None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
         Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,
     }
 }
@@ -132,5 +131,4 @@ fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
     temp_block_buf.push((len >> 16) as u8 & 0xff);
     temp_block_buf.push((len >> 8) as u8 & 0xff);
     temp_block_buf.push((len >> 0) as u8 & 0xff);
- 
 }
