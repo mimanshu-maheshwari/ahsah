@@ -1,5 +1,5 @@
 use std::fmt::LowerHex;
-use std::ops::{Shr, Shl, BitOr};
+use std::ops::{BitOr, Shl, Shr};
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 512;
@@ -7,15 +7,13 @@ const BUFFER_SIZE_BITS: usize = 512;
 const BUFFER_SIZE_U8: usize = BUFFER_SIZE_BITS / 8;
 const BUFFER_SIZE_U32: usize = BUFFER_SIZE_BITS / 32;
 
+const MESSAGE_SCHEDULE_SIZE: usize = 64;
+
 /// Hash size in 4bytes
-#[allow(unused)]
 const HASH_SIZE_BITS: usize = 256;
-#[allow(unused)]
 const HASH_SIZE_U32: usize = HASH_SIZE_BITS / 32;
 
 const LENGTH_VALUE_PADDING_SIZE_BITS: usize = 64;
-#[allow(unused)]
-const BUFFER_SIZE_WITHOUT_LENGTH_BITS: usize = BUFFER_SIZE_BITS - LENGTH_VALUE_PADDING_SIZE_BITS;
 
 const H: [u32; HASH_SIZE_U32] = [
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
@@ -33,7 +31,7 @@ const K: [u32; BUFFER_SIZE_U8] = [
 ];
 
 /// Main hasher function
-pub fn hash(msg: &[u8]) -> Option<()> {
+pub fn hash(msg: &[u8]) -> Option<String> {
     let msg_len: usize = msg.len();
     if msg_len == 0 {
         return None;
@@ -41,12 +39,9 @@ pub fn hash(msg: &[u8]) -> Option<()> {
     println!("INFO: Recived message of length: {msg_len}");
 
     // A single u32 in this buffer is a word of size 32 bits
-    let mut chunk: [u32; BUFFER_SIZE_U32] = [0; BUFFER_SIZE_U32];
+    let mut chunk = [0; BUFFER_SIZE_U32];
 
-    let mut temp_block_buf: Vec<u8> = Vec::new();
-    for i in msg {
-        temp_block_buf.push(*i);
-    }
+    let mut temp_block_buf: Vec<u8> = Vec::from(msg);
 
     println!(
         "INFO: created a temporary buffer of len: {}",
@@ -66,38 +61,121 @@ pub fn hash(msg: &[u8]) -> Option<()> {
         copy_buf_u8_to_u32(&mut temp_block_buf, &mut chunk, i);
 
         // initialize registers
-        let a = hash_value[0];
-        let b = hash_value[1];
-        let c = hash_value[2];
-        let d = hash_value[3];
-        let e = hash_value[4];
-        let f = hash_value[5];
-        let g = hash_value[6];
-        let h = hash_value[7];
-        // print_buf(&chunk);
-        for i in 0..BUFFER_SIZE_U32 {}
+        // message schedule array
+        let mut w = [0; MESSAGE_SCHEDULE_SIZE];
+
+        w[0..16].copy_from_slice(&chunk[..]);
+        for i in 16..=63 {
+            let sigma_0 = sigma_0(w[i - 15]) as u64;
+            let sigma_1 = sigma_1(w[i - 2]) as u64;
+            w[i] = (((sigma_0 + sigma_1) % u32::MAX as u64
+                + (w[i - 16] as u64 + w[i - 7] as u64) % u32::MAX as u64)
+                % u32::MAX as u64) as u32;
+        }
+        let [mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h] = hash_value.clone();
+        compression(
+            &w,
+            (
+                &mut a, &mut b, &mut c, &mut d, &mut e, &mut f, &mut g, &mut h,
+            ),
+        );
+        hash_value[0] = ((a as u64 + hash_value[0] as u64) % u32::MAX as u64) as u32;
+        hash_value[1] = ((b as u64 + hash_value[1] as u64) % u32::MAX as u64) as u32;
+        hash_value[2] = ((c as u64 + hash_value[2] as u64) % u32::MAX as u64) as u32;
+        hash_value[3] = ((d as u64 + hash_value[3] as u64) % u32::MAX as u64) as u32;
+        hash_value[4] = ((e as u64 + hash_value[4] as u64) % u32::MAX as u64) as u32;
+        hash_value[5] = ((f as u64 + hash_value[5] as u64) % u32::MAX as u64) as u32;
+        hash_value[6] = ((g as u64 + hash_value[6] as u64) % u32::MAX as u64) as u32;
+        hash_value[7] = ((h as u64 + hash_value[7] as u64) % u32::MAX as u64) as u32;
     }
 
-    Some(())
+    Some(format!(
+        "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
+        hash_value[0],
+        hash_value[1],
+        hash_value[2],
+        hash_value[3],
+        hash_value[4],
+        hash_value[5],
+        hash_value[6],
+        hash_value[7]
+    ))
 }
 
-fn _ch(_e: u32, _f: u32, _g: u32) {}
-fn _maj(_a: u32, _b: u32, _c: u32) {}
-fn _sum_0(_a: u32) {}
-fn _sum_1(_e: u32) {}
-fn _w_j() {}
-fn _compression() {}
+/// Ch function will work on e, f, g
+fn ch(x: u32, y: u32, z: u32) -> u32 {
+    (x & y) ^ (!x & z)
+}
+/// Maj function will work on a, b, c
+fn maj(x: u32, y: u32, z: u32) -> u32 {
+    (x & y) ^ (x & z) ^ (y & z)
+}
+///Σ0 will work on a
+fn sum_0(x: u32) -> u32 {
+    right_rotate(x, 2) ^ right_rotate(x, 13) ^ right_rotate(x, 22)
+}
 
-fn _right_rotate<T>(num: T, bits: usize) -> T 
-where T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone
+///Σ1 will work on e
+fn sum_1(x: u32) -> u32 {
+    right_rotate(x, 6) ^ right_rotate(x, 11) ^ right_rotate(x, 25)
+}
+
+/// σ0 will work on
+fn sigma_0(x: u32) -> u32 {
+    right_rotate(x, 7) ^ right_rotate(x, 18) ^ right_shift(x, 3)
+}
+
+/// σ1 will work on
+fn sigma_1(x: u32) -> u32 {
+    right_rotate(x, 17) ^ right_rotate(x, 19) ^ right_shift(x, 10)
+}
+
+fn compression(
+    w: &[u32; MESSAGE_SCHEDULE_SIZE],
+    (a, b, c, d, e, f, g, h): (
+        &mut u32,
+        &mut u32,
+        &mut u32,
+        &mut u32,
+        &mut u32,
+        &mut u32,
+        &mut u32,
+        &mut u32,
+    ),
+) {
+    for i in 0..64 {
+        let sum_1 = sum_1(*e) as u64;
+        let ch = ch(*e, *f, *g) as u64;
+        let temp_1 = (((*h as u64 + sum_1) % u32::MAX as u64)
+            + (ch + K[i] as u64) % u32::MAX as u64
+            + w[i] as u64)
+            % u32::MAX as u64;
+        let sum_0 = sum_0(*a) as u64;
+        let maj = maj(*a, *b, *c) as u64;
+        let temp_2 = (sum_0 + maj) % u32::MAX as u64;
+        *h = *g;
+        *g = *f;
+        *f = *e;
+        *e = ((*d as u64 + temp_1) % u32::MAX as u64) as u32;
+        *d = *c;
+        *c = *b;
+        *b = *a;
+        *a = ((temp_1 + temp_2) % u32::MAX as u64) as u32;
+    }
+}
+
+fn right_rotate<T>(num: T, bits: usize) -> T
+where
+    T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,
 {
     let bit_width = std::mem::size_of_val(&num) * 8;
     let bits = bits % bit_width;
     (num.clone() << (bit_width - bits)) | (num.clone() >> (bits))
 }
 
-fn _right_shift<T>(num: T, bits: usize) -> T 
-where T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T>
+fn right_shift<T>(num: T, bits: usize) -> T
+where
+    T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T>,
 {
     let bits = bits % 32;
     num >> (bits)
