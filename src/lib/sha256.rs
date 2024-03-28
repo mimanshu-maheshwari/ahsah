@@ -43,10 +43,7 @@ pub fn hash(msg: &[u8]) -> Option<String> {
 
     let mut temp_block_buf: Vec<u8> = Vec::from(msg);
 
-    println!(
-        "INFO: created a temporary buffer of len: {}",
-        temp_block_buf.len()
-    );
+    // println!( "INFO: created a temporary buffer of len: {}", temp_block_buf.len());
     // read message data into temporary buffer.
 
     /* padding message start */
@@ -191,19 +188,19 @@ where
 fn add_padding(temp_block_buf: &mut Vec<u8>, msg_len: usize) {
     // length of message in bits.
     let l = temp_block_buf.len() * 8;
-    println!("INFO: L: {l} bits or {} bytes", l / 8);
+    // println!("INFO: L: {l} bits or {} bytes", l / 8);
 
     // add a bit at the end of message
     temp_block_buf.push(0x80);
 
-    println!("INFO: added one bit or byte 0x80 at end of temporary buffer");
+    // println!("INFO: added one bit or byte 0x80 at end of temporary buffer");
     let k = k_value(l, Some(8)) / 8;
 
     // add one bit
     // add zero padding
     let mut padding = vec![0; k];
     temp_block_buf.append(&mut padding);
-    println!("INFO: Added {} bits or {k} bytes to the buffer", k * 8);
+    // println!("INFO: Added {} bits or {k} bytes to the buffer", k * 8);
 
     // add message length
     copy_len_to_buf(temp_block_buf, msg_len);
