@@ -1,5 +1,6 @@
+
 #[cfg(test)]
-pub mod ahsah_test {
+pub mod hash_tests {
 
     use sha256::hash;
     #[test]

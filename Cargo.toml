@@ -12,4 +12,8 @@ path       = "src/lib/sha256.rs"
 doc        = true
 crate-type = ["lib"]
 
+[[test]]
+name = "hash_tests"
+path = "tests/hash-tests.rs"
+
 [dependencies]
