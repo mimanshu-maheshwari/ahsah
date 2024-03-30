@@ -27,3 +27,7 @@ ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
 ```
 
 In future will implement more algorithms
+
+## Refs
+* https://github.com/marketplace/actions/build-and-upload-rust-binary-to-github-releases
+* https://github.com/marketplace/actions/rust-release-binary
