@@ -2,10 +2,8 @@
 
 Implementation of SHA-256 algorithm in rust as library.
 
-use sha256 module and import the hash function.
-hash function takes slice of bytes. and returns hash value as String
 
-## Usage: 
+## Example: 
 ```rust
 use ahsah::{hashes::AhsahHasher, sha256::Sha256};
 use std::env::args;
