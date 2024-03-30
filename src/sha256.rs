@@ -1,5 +1,5 @@
+use super::utils::{sum_0, sum_1, maj, ch, sigma_0, sigma_1};
 use std::fmt::LowerHex;
-use std::ops::{BitOr, Shl, Shr};
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 512;
@@ -98,36 +98,6 @@ pub fn hash(msg: &[u8]) -> String {
     )
 }
 
-/// Ch function will work on e, f, g
-fn ch(x: u32, y: u32, z: u32) -> u32 {
-    (x & y) ^ (!x & z)
-}
-
-/// Maj function will work on a, b, c
-fn maj(x: u32, y: u32, z: u32) -> u32 {
-    (x & y) ^ (x & z) ^ (y & z)
-}
-
-///Σ0 will work on a
-fn sum_0(x: u32) -> u32 {
-    right_rotate(x, 2) ^ right_rotate(x, 13) ^ right_rotate(x, 22)
-}
-
-///Σ1 will work on e
-fn sum_1(x: u32) -> u32 {
-    right_rotate(x, 6) ^ right_rotate(x, 11) ^ right_rotate(x, 25)
-}
-
-/// σ0 will work on
-fn sigma_0(x: u32) -> u32 {
-    right_rotate(x, 7) ^ right_rotate(x, 18) ^ right_shift(x, 3)
-}
-
-/// σ1 will work on
-fn sigma_1(x: u32) -> u32 {
-    right_rotate(x, 17) ^ right_rotate(x, 19) ^ right_shift(x, 10)
-}
-
 fn compression(
     w: &[u32; MESSAGE_SCHEDULE_SIZE],
     (a, b, c, d, e, f, g, h): (
@@ -163,23 +133,6 @@ fn compression(
     }
 }
 
-fn right_rotate<T>(num: T, bits: usize) -> T
-where
-    T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,
-{
-    let bit_width = std::mem::size_of_val(&num) * 8;
-    let bits = bits % bit_width;
-    (num.clone() << (bit_width - bits)) | (num.clone() >> (bits))
-}
-
-fn right_shift<T>(num: T, bits: usize) -> T
-where
-    T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T>,
-{
-    let bits = bits % 32;
-    num >> (bits)
-}
-
 #[allow(unused)]
 fn print_buf<T>(buf: &[T]) -> ()
 where
@@ -201,7 +154,7 @@ fn add_padding(temp_block_buf: &mut Vec<u8>) {
     temp_block_buf.push(0x80u8);
 
     // println!("INFO: added one bit or byte 0x80 at end of temporary buffer");
-    let k = k_value(l, Some(8)) / 8;
+    let k = k_value(l, Some(8), LENGTH_VALUE_PADDING_SIZE_BITS, BUFFER_SIZE_BITS) / 8;
 
     // add one bit
     // add zero padding
@@ -230,11 +183,9 @@ fn copy_buf_u8_to_u32(u8_block: &[u8], u32_block: &mut [u32; BUFFER_SIZE_U32], s
     }
 }
 
-/// find the k value for given length
+/// find the k value for given length in bits
 /// (L + 1 + k + 64) mod 512 = 0
-fn k_value(l: usize, one_bit: Option<usize>) -> usize {
-    let padding_size = LENGTH_VALUE_PADDING_SIZE_BITS;
-    let buffer_size = BUFFER_SIZE_BITS;
+fn k_value(l: usize, one_bit: Option<usize>, padding_size:usize, buffer_size:usize) -> usize {
     match one_bit {
         None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
         Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,

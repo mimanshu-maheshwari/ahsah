@@ -1,7 +1,7 @@
 #[cfg(test)]
 pub mod hash_tests {
 
-    use sha256::hash;
+    use ahsah::sha256::hash;
     #[test]
     fn test_empty() {
         let input = b"";
@@ -9,11 +9,11 @@ pub mod hash_tests {
         assert_eq!(expected, hash(input));
     }
     #[test]
-    fn test_abc(){
+    fn test_abc() {
         let input = b"abc";
         let expected = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
         assert_eq!(expected, hash(input));
-     }
+    }
 
     #[test]
     fn test_hello_world() {
@@ -42,21 +42,20 @@ pub mod hash_tests {
         let expected = "0bd28feb624417cb316a1c2cb73e3aaabceed9c54fafaafe6fed323987a160f5";
         assert_eq!(expected, hash(input));
     }
-
 }
 // pub mod logical_function_tests {
-//     use sha256::add_padding; 
-// 
+//     use sha256::add_padding;
+//
 //     #[test]
 //     fn padding_test_1(){
-//         let mut msg:Vec<u8> = vec![61, 62, 63]; 
+//         let mut msg:Vec<u8> = vec![61, 62, 63];
 //         let mut expected: Vec<u8> = vec![61, 62, 63, 0x80];
-//         let mut zero_padding: Vec<u8> = vec![0; 59]; 
+//         let mut zero_padding: Vec<u8> = vec![0; 59];
 //         expected.append(&mut zero_padding);
 //         expected.push(24);
 //         add_padding(&mut msg);
 //         assert_eq!(expected.len(), msg.len());
 //         assert_eq!(expected, msg);
 //     }
-// 
+//
 // }

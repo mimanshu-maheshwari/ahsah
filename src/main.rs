@@ -1,4 +1,4 @@
-use sha256::hash;
+use ahsah::sha256::hash;
 use std::env::args;
 
 fn main() {
