@@ -1,12 +1,12 @@
-use std::io::{stdin, Read};
+use std::io::stdin;
 use ahsah::{hashes::AhsahHasher, sha256::Sha256};
 
 fn main() {
-    let mut stdin = stdin().lock();
-    let mut contents = Vec::new();
-    stdin.read(&mut contents).expect("unable to read data from stdin");
-    drop(stdin);
     let mut hasher = Sha256::new();
-    hasher.digest(&contents);
+    let stdin = stdin(); // We get `Stdin` here.
+    for line in stdin.lines(){
+        let line = line.expect("Unable to read line from stdin");
+        hasher.digest(&line.as_bytes());
+    }
     println!("{}", hasher.finish());
 }
