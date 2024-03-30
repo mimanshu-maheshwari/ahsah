@@ -198,9 +198,7 @@ impl Sha256 {
 }
 
 impl AhsahHasher for Sha256 {
-    fn digest<T>(&mut self, data: T) 
-        where T: AsRef<[u8]> + IntoIterator<Item = u8> + Sized +  Clone,
-        {
+    fn digest(&mut self, data: &[u8]) {
             for byte in data {
                 self.data.push(byte.clone());
             }
@@ -208,8 +206,8 @@ impl AhsahHasher for Sha256 {
 
     /// Main hasher function
     fn finish(&mut self) -> String {
-        // let msg_len: usize = msg.len();
 
+        // let msg_len: usize = self.data.len();
         // println!("INFO: Recived message of length: {msg_len}");
 
         // A single u32 in this buffer is a word of size 32 bits
