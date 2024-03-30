@@ -45,7 +45,7 @@ pub fn hash(msg: &[u8]) -> String {
     // read message data into temporary buffer.
 
     /* padding message start */
-    add_padding(&mut temp_block_buf, msg_len);
+    add_padding(&mut temp_block_buf);
     /* padding message end */
 
     //print_buf(&temp_block_buf)
@@ -99,30 +99,32 @@ pub fn hash(msg: &[u8]) -> String {
 }
 
 /// Ch function will work on e, f, g
-fn ch(x: u32, y: u32, z: u32) -> u32 {
+pub fn ch(x: u32, y: u32, z: u32) -> u32 {
     (x & y) ^ (!x & z)
 }
+
 /// Maj function will work on a, b, c
-fn maj(x: u32, y: u32, z: u32) -> u32 {
+pub fn maj(x: u32, y: u32, z: u32) -> u32 {
     (x & y) ^ (x & z) ^ (y & z)
 }
+
 ///Σ0 will work on a
-fn sum_0(x: u32) -> u32 {
+pub fn sum_0(x: u32) -> u32 {
     right_rotate(x, 2) ^ right_rotate(x, 13) ^ right_rotate(x, 22)
 }
 
 ///Σ1 will work on e
-fn sum_1(x: u32) -> u32 {
+pub fn sum_1(x: u32) -> u32 {
     right_rotate(x, 6) ^ right_rotate(x, 11) ^ right_rotate(x, 25)
 }
 
 /// σ0 will work on
-fn sigma_0(x: u32) -> u32 {
+pub fn sigma_0(x: u32) -> u32 {
     right_rotate(x, 7) ^ right_rotate(x, 18) ^ right_shift(x, 3)
 }
 
 /// σ1 will work on
-fn sigma_1(x: u32) -> u32 {
+pub fn sigma_1(x: u32) -> u32 {
     right_rotate(x, 17) ^ right_rotate(x, 19) ^ right_shift(x, 10)
 }
 
@@ -161,7 +163,7 @@ fn compression(
     }
 }
 
-fn right_rotate<T>(num: T, bits: usize) -> T
+pub fn right_rotate<T>(num: T, bits: usize) -> T
 where
     T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,
 {
@@ -170,7 +172,7 @@ where
     (num.clone() << (bit_width - bits)) | (num.clone() >> (bits))
 }
 
-fn right_shift<T>(num: T, bits: usize) -> T
+pub fn right_shift<T>(num: T, bits: usize) -> T
 where
     T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T>,
 {
@@ -190,13 +192,13 @@ where
     println!("]");
 }
 
-fn add_padding(temp_block_buf: &mut Vec<u8>, msg_len: usize) {
+pub fn add_padding(temp_block_buf: &mut Vec<u8>) {
     // length of message in bits.
     let l = temp_block_buf.len() * 8;
     // println!("INFO: L: {l} bits or {} bytes", l / 8);
 
     // add a bit at the end of message
-    temp_block_buf.push(0x80);
+    temp_block_buf.push(0x80u8);
 
     // println!("INFO: added one bit or byte 0x80 at end of temporary buffer");
     let k = k_value(l, Some(8)) / 8;
@@ -208,7 +210,7 @@ fn add_padding(temp_block_buf: &mut Vec<u8>, msg_len: usize) {
     // println!("INFO: Added {} bits or {k} bytes to the buffer", k * 8);
 
     // add message length
-    copy_len_to_buf(temp_block_buf, msg_len);
+    copy_len_to_buf(temp_block_buf, l);
 }
 
 /// will copy the data of u8 vec into a array of u32.
