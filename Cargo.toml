@@ -19,4 +19,16 @@ default-run = "ahsah"
 name = "hash_tests"
 path = "tests/hash-tests.rs"
 
+[[example]]
+name = "string_hasher"
+path = "examples/string-hasher.rs"
+
+[[example]]
+name = "stdin_hasher"
+path = "examples/stdin-hasher.rs"
+
+[[example]]
+name = "file_hasher"
+path = "examples/file-hasher.rs"
+
 [dependencies]
