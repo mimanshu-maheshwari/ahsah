@@ -9,7 +9,8 @@ fn main() {
     };
     let mut hasher = Sha256::new();
     let mut buf = Vec::new();
-    file.read(&mut buf).unwrap();
+    let bytes = file.read(&mut buf).unwrap();
+    println!("{bytes} read of file");
     hasher.digest(&buf);
     println!("{}", hasher.finish());
 }
