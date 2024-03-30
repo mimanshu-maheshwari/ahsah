@@ -36,6 +36,12 @@ pub mod hash_tests {
         assert_eq!(expected, hash(input));
     }
 
+    #[test]
+    fn test_maheshwari() {
+        let input = b"maheshwari";
+        let expected = "0bd28feb624417cb316a1c2cb73e3aaabceed9c54fafaafe6fed323987a160f5";
+        assert_eq!(expected, hash(input));
+    }
 
 }
 // pub mod logical_function_tests {
