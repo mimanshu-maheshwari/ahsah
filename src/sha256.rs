@@ -37,8 +37,13 @@ pub struct Sha256 {
 }
 
 impl Sha256 {
+
     pub fn new() -> Self {
         Self { data: Vec::new() }
+    }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
     }
 
     fn compression(

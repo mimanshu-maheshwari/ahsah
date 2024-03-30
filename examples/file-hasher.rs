@@ -11,5 +11,6 @@ fn main() {
     let contents = fs::read_to_string(file_path)
         .expect("Should have been able to read the file");
     hasher.digest(&contents.as_bytes());
+    println!("Hashing {} bytes.", hasher.len());
     println!("{}", hasher.finish());
 }

@@ -8,5 +8,6 @@ fn main() {
     };
     let mut hasher = Sha256::new();
     hasher.digest(&message.as_bytes());
+    println!("Hashing {} bytes.", hasher.len());
     println!("{}", hasher.finish());
 }
