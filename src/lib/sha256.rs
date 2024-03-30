@@ -99,32 +99,32 @@ pub fn hash(msg: &[u8]) -> String {
 }
 
 /// Ch function will work on e, f, g
-pub fn ch(x: u32, y: u32, z: u32) -> u32 {
+fn ch(x: u32, y: u32, z: u32) -> u32 {
     (x & y) ^ (!x & z)
 }
 
 /// Maj function will work on a, b, c
-pub fn maj(x: u32, y: u32, z: u32) -> u32 {
+fn maj(x: u32, y: u32, z: u32) -> u32 {
     (x & y) ^ (x & z) ^ (y & z)
 }
 
 ///Σ0 will work on a
-pub fn sum_0(x: u32) -> u32 {
+fn sum_0(x: u32) -> u32 {
     right_rotate(x, 2) ^ right_rotate(x, 13) ^ right_rotate(x, 22)
 }
 
 ///Σ1 will work on e
-pub fn sum_1(x: u32) -> u32 {
+fn sum_1(x: u32) -> u32 {
     right_rotate(x, 6) ^ right_rotate(x, 11) ^ right_rotate(x, 25)
 }
 
 /// σ0 will work on
-pub fn sigma_0(x: u32) -> u32 {
+fn sigma_0(x: u32) -> u32 {
     right_rotate(x, 7) ^ right_rotate(x, 18) ^ right_shift(x, 3)
 }
 
 /// σ1 will work on
-pub fn sigma_1(x: u32) -> u32 {
+fn sigma_1(x: u32) -> u32 {
     right_rotate(x, 17) ^ right_rotate(x, 19) ^ right_shift(x, 10)
 }
 
@@ -163,7 +163,7 @@ fn compression(
     }
 }
 
-pub fn right_rotate<T>(num: T, bits: usize) -> T
+fn right_rotate<T>(num: T, bits: usize) -> T
 where
     T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,
 {
@@ -172,7 +172,7 @@ where
     (num.clone() << (bit_width - bits)) | (num.clone() >> (bits))
 }
 
-pub fn right_shift<T>(num: T, bits: usize) -> T
+fn right_shift<T>(num: T, bits: usize) -> T
 where
     T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T>,
 {
@@ -192,7 +192,7 @@ where
     println!("]");
 }
 
-pub fn add_padding(temp_block_buf: &mut Vec<u8>) {
+fn add_padding(temp_block_buf: &mut Vec<u8>) {
     // length of message in bits.
     let l = temp_block_buf.len() * 8;
     // println!("INFO: L: {l} bits or {} bytes", l / 8);
