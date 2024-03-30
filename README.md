@@ -2,6 +2,18 @@
 
 Implementation of SHA-256 algorithm in rust as library.
 
+Currently file hasher only supports string data in files. Binary data is not supported.
+but library takes bytes only so can can create a binary file hasher as well.
+
+In release you can download hashers:
+```console
+$ ./file_hasher.exe <filename>
+$ ./string_hasher.exe "string"
+$ ./stdin_hasher.exe <<< "datastring"
+$ echo "data" | ./stdin_hasher.exe 
+$ cat filename | ./stdin_hasher.exe
+```
+
 
 ## Example: 
 ```rust
