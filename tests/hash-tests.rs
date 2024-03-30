@@ -1,7 +1,7 @@
 #[cfg(test)]
 pub mod hash_tests {
 
-    pub mod sha256_test{
+    pub mod sha256_test {
 
         use ahsah::sha256::hash;
         #[test]

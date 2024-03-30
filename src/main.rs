@@ -1,4 +1,4 @@
-use ahsah::sha256::hash;
+use ahsah::{hashes::AhsahHasher, sha256::Sha256};
 use std::env::args;
 
 fn main() {
@@ -7,5 +7,7 @@ fn main() {
         Some(val) => val,
         None => String::from("abc"),
     };
-    println!("{}", hash(message.as_bytes()));
+    let mut hasher = Sha256::new();
+    hasher.digest(message.as_bytes());
+    println!("{}", hasher.finish());
 }
