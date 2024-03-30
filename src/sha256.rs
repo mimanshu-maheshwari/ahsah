@@ -32,9 +32,9 @@ const K: [u32; BUFFER_SIZE_U8] = [
 
 /// Main hasher function
 pub fn hash(msg: &[u8]) -> String {
-    let msg_len: usize = msg.len();
+    // let msg_len: usize = msg.len();
 
-    println!("INFO: Recived message of length: {msg_len}");
+    // println!("INFO: Recived message of length: {msg_len}");
 
     // A single u32 in this buffer is a word of size 32 bits
     let mut chunk = [0; BUFFER_SIZE_U32];
