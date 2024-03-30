@@ -198,11 +198,13 @@ impl Sha256 {
 }
 
 impl AhsahHasher for Sha256 {
-    fn digest(&mut self, data: &[u8]) {
-        for byte in data {
-            self.data.push(byte.clone());
+    fn digest<T>(&mut self, data: T) 
+        where T: AsRef<[u8]> + IntoIterator<Item = u8> + Sized +  Clone,
+        {
+            for byte in data {
+                self.data.push(byte.clone());
+            }
         }
-    }
 
     /// Main hasher function
     fn finish(&mut self) -> String {
