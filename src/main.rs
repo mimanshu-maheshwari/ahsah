@@ -7,7 +7,5 @@ fn main() {
         Some(val) => val,
         None => String::from("abc"),
     };
-    if let Some(val) = hash(message.as_bytes()){
-        println!("{val}");
-    }
+    println!("{}", hash(message.as_bytes()));
 }

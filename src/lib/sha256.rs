@@ -31,11 +31,9 @@ const K: [u32; BUFFER_SIZE_U8] = [
 ];
 
 /// Main hasher function
-pub fn hash(msg: &[u8]) -> Option<String> {
+pub fn hash(msg: &[u8]) -> String {
     let msg_len: usize = msg.len();
-    if msg_len == 0 {
-        return None;
-    }
+
     println!("INFO: Recived message of length: {msg_len}");
 
     // A single u32 in this buffer is a word of size 32 bits
@@ -65,7 +63,10 @@ pub fn hash(msg: &[u8]) -> Option<String> {
         for i in 16..=63 {
             let sigma_0 = sigma_0(w[i - 15]);
             let sigma_1 = sigma_1(w[i - 2]);
-            w[i] = sigma_0.wrapping_add(sigma_1).wrapping_add(w[i - 16]).wrapping_add(w[i - 7]);
+            w[i] = sigma_0
+                .wrapping_add(sigma_1)
+                .wrapping_add(w[i - 16])
+                .wrapping_add(w[i - 7]);
         }
         let [mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h] = hash_value.clone();
         compression(
@@ -84,7 +85,7 @@ pub fn hash(msg: &[u8]) -> Option<String> {
         hash_value[7] = h.wrapping_add(hash_value[7]);
     }
 
-    Some(format!(
+    format!(
         "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
         hash_value[0],
         hash_value[1],
@@ -94,7 +95,7 @@ pub fn hash(msg: &[u8]) -> Option<String> {
         hash_value[5],
         hash_value[6],
         hash_value[7]
-    ))
+    )
 }
 
 /// Ch function will work on e, f, g
@@ -141,7 +142,11 @@ fn compression(
     for i in 0..64 {
         let sum_1 = sum_1(*e);
         let ch = ch(*e, *f, *g);
-        let temp_1 = h.wrapping_add( sum_1).wrapping_add(ch).wrapping_add(K[i]).wrapping_add(w[i]);
+        let temp_1 = h
+            .wrapping_add(sum_1)
+            .wrapping_add(ch)
+            .wrapping_add(K[i])
+            .wrapping_add(w[i]);
         let sum_0 = sum_0(*a);
         let maj = maj(*a, *b, *c);
         let temp_2 = sum_0.wrapping_add(maj);
