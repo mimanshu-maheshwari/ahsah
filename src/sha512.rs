@@ -1,5 +1,5 @@
 use super::hashes::AhsahHasher;
-use super::utils::{ch, maj, print_buf, right_rotate, right_shift};
+use super::utils::{ch, maj, right_rotate, right_shift};
 use std::ops::{BitOr, BitXor, Shl, Shr};
 
 /// Message buffer size in bits
@@ -213,19 +213,16 @@ impl Sha512 {
     fn add_padding(temp_block_buf: &mut Vec<u8>) {
         // length of message in bits.
         let l = temp_block_buf.len() * 8;
-        // println!("INFO: L: {l} bits or {} bytes", l / 8);
 
         // add a bit at the end of message
         temp_block_buf.push(0x80u8);
 
-        // println!("INFO: added one bit or byte 0x80 at end of temporary buffer");
         let k = Self::k_value(l, Some(8), LENGTH_VALUE_PADDING_SIZE_BITS, BUFFER_SIZE_BITS) / 8;
 
         // add one bit
         // add zero padding
         let mut padding = vec![0; k];
         temp_block_buf.append(&mut padding);
-        // println!("INFO: Added {} bits or {k} bytes to the buffer", k * 8);
 
         // add message length
         Self::copy_len_to_buf(temp_block_buf, l);
@@ -292,19 +289,15 @@ impl AhsahHasher for Sha512 {
     /// Main hasher function
     fn finish(&mut self) -> String {
         // let msg_len: usize = self.data.len();
-        // println!("INFO: Recived message of length: {msg_len}");
 
         let mut chunk = [0; BUFFER_SIZE_U64];
 
-        // println!( "INFO: created a temporary buffer of len: {}", temp_block_buf.len());
         // read message data into temporary buffer.
 
         /* padding message start */
         Self::add_padding(&mut self.data);
         /* padding message end */
 
-        // println!("Buffer:");
-        // print_buf(&self.data);
         let mut hash_value = H.clone();
 
         // initialize registers
@@ -314,8 +307,6 @@ impl AhsahHasher for Sha512 {
         for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
             // copy into active block buffer
             Self::copy_buf_u8_to_u64(&mut self.data, &mut chunk, i);
-            // println!("Chunk {i}|{}:", (i / BUFFER_SIZE_U8 + 1));
-            // print_buf(&chunk);
 
             w[0..16].copy_from_slice(&chunk[..]);
             for i in 16..MESSAGE_SCHEDULE_SIZE {
