@@ -1,6 +1,5 @@
 use super::hashes::AhsahHasher;
 use super::utils::{ch, maj, right_rotate, right_shift};
-use std::fmt::LowerHex;
 use std::ops::{BitOr, BitXor, Shl, Shr};
 
 /// Message buffer size in bits
