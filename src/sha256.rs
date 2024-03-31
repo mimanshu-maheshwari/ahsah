@@ -37,7 +37,6 @@ pub struct Sha256 {
 }
 
 impl Sha256 {
-
     pub fn new() -> Self {
         Self { data: Vec::new() }
     }
@@ -120,7 +119,7 @@ impl Sha256 {
     }
 
     /// σ1 will work on
-    pub(crate) fn sigma_1<T>(x: T) -> T
+    fn sigma_1<T>(x: T) -> T
     where
         T: Shr<usize, Output = T>
             + Shl<usize, Output = T>
@@ -130,17 +129,6 @@ impl Sha256 {
             + Copy,
     {
         right_rotate(x, 17) ^ right_rotate(x, 19) ^ right_shift(x, 10)
-    }
-    #[allow(unused)]
-    fn print_buf<T>(buf: &[T]) -> ()
-    where
-        T: LowerHex,
-    {
-        print!("Buffer:\n[ ");
-        for i in 0..buf.len() {
-            print!("0x{val:08x} ", val = buf[i]);
-        }
-        println!("]");
     }
 
     fn add_padding(temp_block_buf: &mut Vec<u8>) {
@@ -204,14 +192,13 @@ impl Sha256 {
 
 impl AhsahHasher for Sha256 {
     fn digest(&mut self, data: &[u8]) {
-            for byte in data {
-                self.data.push(byte.clone());
-            }
+        for byte in data {
+            self.data.push(byte.clone());
         }
+    }
 
     /// Main hasher function
     fn finish(&mut self) -> String {
-
         // let msg_len: usize = self.data.len();
         // println!("INFO: Recived message of length: {msg_len}");
 

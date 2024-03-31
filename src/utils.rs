@@ -1,4 +1,17 @@
+use std::fmt::LowerHex;
 use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
+
+#[allow(unused)]
+pub(crate) fn print_buf<T>(buf: &[T]) -> ()
+where
+    T: LowerHex,
+{
+    print!("Buffer:\n[ ");
+    for i in 0..buf.len() {
+        print!("0x{val:08x} ", val = buf[i]);
+    }
+    println!("]");
+}
 
 pub(crate) fn right_rotate<T>(num: T, bits: usize) -> T
 where
