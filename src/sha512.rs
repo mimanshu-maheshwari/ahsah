@@ -1,5 +1,5 @@
 use super::hashes::AhsahHasher;
-use super::utils::{ch, maj, right_rotate, right_shift};
+use super::utils::{ch, maj, right_rotate, right_shift, print_buf};
 use std::ops::{BitOr, BitXor, Shl, Shr};
 
 /// Message buffer size in bits
@@ -175,14 +175,15 @@ impl Sha512 {
             val = (data.len() - start)
         );
         for i in 0..BUFFER_SIZE_U64 {
-            block[i] = (data[start + (i * 4) + 0] as u64) << 56
-                | (data[start + (i * 4) + 1] as u64) << 48
-                | (data[start + (i * 4) + 2] as u64) << 40
-                | (data[start + (i * 4) + 3] as u64) << 32
-                | (data[start + (i * 4) + 4] as u64) << 24
-                | (data[start + (i * 4) + 5] as u64) << 16
-                | (data[start + (i * 4) + 6] as u64) << 8
-                | data[start + (i * 4) + 7] as u64;
+            block[i] = 
+                  (data[start + (i * 8) + 0] as u64) << 56
+                | (data[start + (i * 8) + 1] as u64) << 48
+                | (data[start + (i * 8) + 2] as u64) << 40
+                | (data[start + (i * 8) + 3] as u64) << 32
+                | (data[start + (i * 8) + 4] as u64) << 24
+                | (data[start + (i * 8) + 5] as u64) << 16
+                | (data[start + (i * 8) + 6] as u64) << 8
+                |  data[start + (i * 8) + 7] as u64;
         }
     }
 
@@ -237,7 +238,8 @@ impl AhsahHasher for Sha512 {
         Self::add_padding(&mut self.data);
         /* padding message end */
 
-        //print_buf(&temp_block_buf)
+        println!("Buffer:");
+        print_buf(&self.data);
         let mut hash_value = H.clone();
 
         // initialize registers
@@ -248,6 +250,8 @@ impl AhsahHasher for Sha512 {
         for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
             // copy into active block buffer
             Self::copy_buf_u8_to_u64(&mut self.data, &mut chunk, i);
+            println!("Chunk {i}|{}:", (i / BUFFER_SIZE_U8 + 1));
+            print_buf(&chunk);
 
             w[0..16].copy_from_slice(&chunk[..]);
             for i in 16..MESSAGE_SCHEDULE_SIZE {
@@ -276,7 +280,7 @@ impl AhsahHasher for Sha512 {
         }
 
         format!(
-            "{:16x}{:16x}{:16x}{:16x}{:16x}{:16x}{:16x}{:16x}",
+            "{:016x}{:016x}{:016x}{:016x}{:016x}{:016x}{:016x}{:016x}",
             hash_value[0],
             hash_value[1],
             hash_value[2],

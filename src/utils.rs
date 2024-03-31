@@ -6,9 +6,9 @@ pub(crate) fn print_buf<T>(buf: &[T]) -> ()
 where
     T: LowerHex,
 {
-    print!("Buffer:\n[ ");
+    print!("[ ");
     for i in 0..buf.len() {
-        print!("0x{val:08x} ", val = buf[i]);
+        print!("{:x} ", buf[i]);
     }
     println!("]");
 }

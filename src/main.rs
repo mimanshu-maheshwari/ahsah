@@ -1,4 +1,4 @@
-use ahsah::{hashes::AhsahHasher, sha256::Sha256};
+use ahsah::{hashes::AhsahHasher, sha512::Sha512};
 use std::{
     fs::File,
     io::{BufRead, BufReader},
@@ -6,10 +6,10 @@ use std::{
 };
 
 fn main() {
-    let mut hasher = Sha256::new();
+    let mut hasher = Sha512::new();
     let file_path = match args().skip(1).next() {
         Some(val) => val,
-        None => String::from("res/poem.txt"),
+        None => String::from("res/test.txt"),
     };
     let file = File::open(&file_path).expect("Unable to open file");
     let buf_reader = BufReader::new(file);
