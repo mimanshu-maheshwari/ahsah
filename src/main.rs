@@ -1,7 +1,7 @@
 use ahsah::{hashes::AhsahHasher, sha256::Sha256};
 use std::{
     fs::File,
-    io::{BufRead, BufReader, Read},
+    io::{BufRead, BufReader},
     env::args,
 };
 

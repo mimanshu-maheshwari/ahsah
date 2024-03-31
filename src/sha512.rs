@@ -165,7 +165,7 @@ impl Sha512 {
         Self::copy_len_to_buf(temp_block_buf, l);
     }
 
-    /// will copy the data of u8 vec into a array of u32.
+    /// will copy the data of u8 vec into a array of u64.
     /// we can assert for u8_block remaining bytes length but it should not fail because we
     /// will be padding the vec before copying the data int buffer block.
     fn copy_buf_u8_to_u64(data: &[u8], block: &mut [u64; BUFFER_SIZE_U64], start: usize) {
@@ -228,7 +228,6 @@ impl AhsahHasher for Sha512 {
         // let msg_len: usize = self.data.len();
         // println!("INFO: Recived message of length: {msg_len}");
 
-        // A single u32 in this buffer is a word of size 32 bits
         let mut chunk = [0; BUFFER_SIZE_U64];
 
         // println!( "INFO: created a temporary buffer of len: {}", temp_block_buf.len());
@@ -241,13 +240,14 @@ impl AhsahHasher for Sha512 {
         //print_buf(&temp_block_buf)
         let mut hash_value = H.clone();
 
+        // initialize registers
+        // message schedule array
+        let mut w = [0; MESSAGE_SCHEDULE_SIZE];
+
+
         for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
             // copy into active block buffer
             Self::copy_buf_u8_to_u64(&mut self.data, &mut chunk, i);
-
-            // initialize registers
-            // message schedule array
-            let mut w = [0; MESSAGE_SCHEDULE_SIZE];
 
             w[0..16].copy_from_slice(&chunk[..]);
             for i in 16..MESSAGE_SCHEDULE_SIZE {

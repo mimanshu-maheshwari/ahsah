@@ -1,15 +1,22 @@
 use ahsah::{hashes::AhsahHasher, sha256::Sha256};
-use std::env::args;
-use std::fs;
+use std::{
+    fs::File,
+    io::{BufRead, BufReader},
+    env::args,
+};
 
 fn main() {
-    let file_path = match args().skip(1).next() {
-        Some(name) => name,
-        None => panic!("No file name provided"),
-    };
     let mut hasher = Sha256::new();
-    let contents = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    hasher.digest(&contents.as_bytes());
-    println!("Hashing {} bytes.", hasher.len());
+    let file_path = match args().skip(1).next() {
+        Some(val) => val,
+        None => panic!("File name is required as argumnet"),
+    };
+    let file = File::open(&file_path).expect("Unable to open file");
+    let buf_reader = BufReader::new(file);
+    for line in buf_reader.lines() {
+        let line = line.expect("Unable to read line");
+        hasher.digest(&line.as_bytes());
+    }
+    println!("Hashing {} bytes", hasher.len());
     println!("{}", hasher.finish());
 }
