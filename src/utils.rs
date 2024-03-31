@@ -6,7 +6,7 @@ pub(crate) fn print_buf<T>(buf: &[T]) -> ()
 where
     T: LowerHex,
 {
-    print!("[ ");
+    print!("\n[ ");
     for i in 0..buf.len() {
         print!("{:x} ", buf[i]);
     }

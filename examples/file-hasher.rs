@@ -1,8 +1,8 @@
 use ahsah::{hashes::AhsahHasher, sha256::Sha256};
 use std::{
+    env::args,
     fs::File,
     io::{BufRead, BufReader},
-    env::args,
 };
 
 fn main() {

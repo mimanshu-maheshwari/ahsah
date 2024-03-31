@@ -134,7 +134,7 @@ pub mod hash_tests {
 }
 // pub mod logical_function_tests {
 //     use ahsah::sha512::Sha512;
-// 
+//
 //     #[test]
 //     fn padding_test_1(){
 //         let mut msg:Vec<u8> = vec![61, 62, 63];
