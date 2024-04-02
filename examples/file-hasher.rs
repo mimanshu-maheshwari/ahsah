@@ -11,7 +11,7 @@ use clap::Parser;
 #[command(version, about, long_about = None)]
 struct Args {
     /// type of hasher you want to run. option can be sha512 and sha256
-    #[arg(short, long, default_value_t = String::from("sha256"))]
+    #[arg(short, long)]
     kind: String,
 
     /// path to file
