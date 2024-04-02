@@ -32,3 +32,4 @@ name = "file_hasher"
 path = "examples/file-hasher.rs"
 
 [dependencies]
+clap = {version = "4.5.4", features = ["derive"]}
