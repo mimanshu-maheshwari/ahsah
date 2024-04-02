@@ -166,8 +166,8 @@ impl AhsahHasher for Sha256 {
 
             w[0..16].copy_from_slice(&chunk[..]);
             for i in 16..MESSAGE_SCHEDULE_SIZE {
-                let sigma_0 = sigma_0(w[i - 15],(7,18, 3));
-                let sigma_1 = sigma_1(w[i - 2],(17,19,10) );
+                let sigma_0 = sigma_0(w[i - 15], (7, 18, 3));
+                let sigma_1 = sigma_1(w[i - 2], (17, 19, 10));
                 w[i] = sigma_0
                     .wrapping_add(sigma_1)
                     .wrapping_add(w[i - 16])

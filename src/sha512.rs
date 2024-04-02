@@ -1,6 +1,5 @@
 use super::hashes::AhsahHasher;
-use super::utils::{ch, maj, right_rotate, right_shift, sum_0, sum_1, sigma_0, sigma_1};
-use std::ops::{BitOr, BitXor, Shl, Shr};
+use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1};
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 1024;
@@ -137,7 +136,7 @@ impl Sha512 {
         ),
     ) {
         for i in 0..MESSAGE_SCHEDULE_SIZE {
-            let sum_1 = sum_1(*e, (14,18, 41));
+            let sum_1 = sum_1(*e, (14, 18, 41));
             let ch = ch(*e, *f, *g);
             let temp_1 = h
                 .wrapping_add(sum_1)
@@ -258,7 +257,7 @@ impl AhsahHasher for Sha512 {
 
             w[0..16].copy_from_slice(&chunk[..]);
             for i in 16..MESSAGE_SCHEDULE_SIZE {
-                let sigma_0 = sigma_0(w[i - 15], (1,8,7));
+                let sigma_0 = sigma_0(w[i - 15], (1, 8, 7));
                 let sigma_1 = sigma_1(w[i - 2], (19, 61, 6));
                 w[i] = sigma_0
                     .wrapping_add(sigma_1)
