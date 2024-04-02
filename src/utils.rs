@@ -1,6 +1,5 @@
 use std::fmt::LowerHex;
-use std::num::Wrapping;
-use std::ops::{Add, BitAnd, BitOr, BitXor, Not, Shl, Shr};
+use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
 
 #[allow(unused)]
 pub(crate) fn print_buf<T>(buf: &[T]) -> ()

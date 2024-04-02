@@ -2,7 +2,7 @@ use ahsah::{hashes::AhsahHasher, sha512::Sha512};
 use std::{
     env::args,
     fs::File,
-    io::{BufRead, BufReader},
+    io::{BufReader, Read},
 };
 
 fn main() {
@@ -12,10 +12,13 @@ fn main() {
         None => String::from("res/test.txt"),
     };
     let file = File::open(&file_path).expect("Unable to open file");
-    let buf_reader = BufReader::new(file);
-    for line in buf_reader.lines() {
-        let line = line.expect("Unable to read line");
-        hasher.digest(&line.as_bytes());
+    let mut buf_reader = BufReader::new(file);
+    let mut buffer = [0; 1024]; 
+    while let Ok(n) = buf_reader.read(&mut buffer) {
+        if n == 0 {
+            break;
+        }
+        hasher.digest(&buffer[..n]);
     }
     println!("Hashing {} bytes", hasher.len());
     println!("{}", hasher.finish());
