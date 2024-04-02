@@ -13,6 +13,60 @@ where
     println!("]");
 }
 
+    ///Σ0 will work on a
+pub(crate) fn sum_0<T>(x: T, (a, b, c): (usize, usize, usize)) -> T
+    where
+        T: Shr<usize, Output = T>
+            + Shl<usize, Output = T>
+            + BitOr<T, Output = T>
+            + BitXor<T, Output = T>
+            + Clone
+            + Copy,
+    {
+        right_rotate(x, a) ^ right_rotate(x, b) ^ right_rotate(x, c)
+    }
+
+    ///Σ1 will work on e
+pub(crate) fn sum_1<T>(x: T, (a, b, c): (usize, usize, usize)) -> T
+    where
+        T: Shr<usize, Output = T>
+            + Shl<usize, Output = T>
+            + BitOr<T, Output = T>
+            + BitXor<T, Output = T>
+            + Clone
+            + Copy,
+    {
+        right_rotate(x, a) ^ right_rotate(x, b) ^ right_rotate(x, c)
+    }
+
+    /// σ0 will work on
+pub(crate) fn sigma_0<T>(x: T, (a, b, c): (usize, usize, usize)) -> T
+    where
+        T: Shr<usize, Output = T>
+            + Shl<usize, Output = T>
+            + BitOr<T, Output = T>
+            + BitXor<T, Output = T>
+            + Clone
+            + Copy,
+    {
+        right_rotate(x, a) ^ right_rotate(x, b) ^ right_shift(x, c)
+    }
+
+    /// σ1 will work on
+pub(crate) fn sigma_1<T>(x: T, (a, b, c): (usize, usize, usize)) -> T
+    where
+        T: Shr<usize, Output = T>
+            + Shl<usize, Output = T>
+            + BitOr<T, Output = T>
+            + BitXor<T, Output = T>
+            + Clone
+            + Copy,
+    {
+        right_rotate(x, a) ^ right_rotate(x, b) ^ right_shift(x, c)
+    }
+
+
+
 pub(crate) fn right_rotate<T>(num: T, bits: usize) -> T
 where
     T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,

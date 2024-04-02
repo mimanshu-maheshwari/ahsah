@@ -1,6 +1,5 @@
 use super::hashes::AhsahHasher;
-use super::utils::{ch, maj, right_rotate, right_shift};
-use std::ops::{BitOr, BitXor, Shl, Shr};
+use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1};
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 512;
@@ -58,14 +57,14 @@ impl Sha256 {
         ),
     ) {
         for i in 0..MESSAGE_SCHEDULE_SIZE {
-            let sum_1 = Self::sum_1(*e);
+            let sum_1 = sum_1(*e, (6, 11, 25));
             let ch = ch(*e, *f, *g);
             let temp_1 = h
                 .wrapping_add(sum_1)
                 .wrapping_add(ch)
                 .wrapping_add(K[i])
                 .wrapping_add(w[i]);
-            let sum_0 = Self::sum_0(*a);
+            let sum_0 = sum_0(*a, (2, 13, 22));
             let maj = maj(*a, *b, *c);
             let temp_2 = sum_0.wrapping_add(maj);
             *h = *g;
@@ -77,57 +76,6 @@ impl Sha256 {
             *b = *a;
             *a = temp_1.wrapping_add(temp_2);
         }
-    }
-    ///Σ0 will work on a
-    fn sum_0<T>(x: T) -> T
-    where
-        T: Shr<usize, Output = T>
-            + Shl<usize, Output = T>
-            + BitOr<T, Output = T>
-            + BitXor<T, Output = T>
-            + Clone
-            + Copy,
-    {
-        right_rotate(x, 2) ^ right_rotate(x, 13) ^ right_rotate(x, 22)
-    }
-
-    ///Σ1 will work on e
-    fn sum_1<T>(x: T) -> T
-    where
-        T: Shr<usize, Output = T>
-            + Shl<usize, Output = T>
-            + BitOr<T, Output = T>
-            + BitXor<T, Output = T>
-            + Clone
-            + Copy,
-    {
-        right_rotate(x, 6) ^ right_rotate(x, 11) ^ right_rotate(x, 25)
-    }
-
-    /// σ0 will work on
-    fn sigma_0<T>(x: T) -> T
-    where
-        T: Shr<usize, Output = T>
-            + Shl<usize, Output = T>
-            + BitOr<T, Output = T>
-            + BitXor<T, Output = T>
-            + Clone
-            + Copy,
-    {
-        right_rotate(x, 7) ^ right_rotate(x, 18) ^ right_shift(x, 3)
-    }
-
-    /// σ1 will work on
-    fn sigma_1<T>(x: T) -> T
-    where
-        T: Shr<usize, Output = T>
-            + Shl<usize, Output = T>
-            + BitOr<T, Output = T>
-            + BitXor<T, Output = T>
-            + Clone
-            + Copy,
-    {
-        right_rotate(x, 17) ^ right_rotate(x, 19) ^ right_shift(x, 10)
     }
 
     fn add_padding(temp_block_buf: &mut Vec<u8>) {
@@ -218,8 +166,8 @@ impl AhsahHasher for Sha256 {
 
             w[0..16].copy_from_slice(&chunk[..]);
             for i in 16..MESSAGE_SCHEDULE_SIZE {
-                let sigma_0 = Self::sigma_0(w[i - 15]);
-                let sigma_1 = Self::sigma_1(w[i - 2]);
+                let sigma_0 = sigma_0(w[i - 15],(7,18, 3));
+                let sigma_1 = sigma_1(w[i - 2],(17,19,10) );
                 w[i] = sigma_0
                     .wrapping_add(sigma_1)
                     .wrapping_add(w[i - 16])
