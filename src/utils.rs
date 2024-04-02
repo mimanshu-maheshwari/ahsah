@@ -1,6 +1,29 @@
 use std::fmt::LowerHex;
 use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
 
+use clap::{Parser, ValueEnum};
+
+#[derive(Debug, ValueEnum, Clone)]
+pub enum HasherKind {
+    Sha512,
+    Sha256,
+}
+
+/// Simple program to greet a person
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+pub struct Args {
+
+    /// Type of hasher you want to run.
+    // #[arg(short, long)]
+    #[arg(short, long, value_enum)]
+    pub kind: HasherKind,
+
+    /// Path to file
+    #[arg(short, long)]
+    pub path: String,
+}
+
 #[allow(unused)]
 pub(crate) fn print_buf<T>(buf: &[T]) -> ()
 where
