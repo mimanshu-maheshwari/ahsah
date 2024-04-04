@@ -1,5 +1,6 @@
 use super::hashes::AhsahHasher;
 use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1};
+use std::io::prelude::Read;
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 512;
@@ -30,13 +31,22 @@ const K: [u32; BUFFER_SIZE_U8] = [
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 ];
 
+#[derive(Debug)]
 pub struct Sha256 {
     data: Vec<u8>,
+    hashes: [u32; HASH_SIZE_U32],
+    chunk: [u32; BUFFER_SIZE_U32],
+    bytes_len: usize,
 }
 
 impl Sha256 {
     pub fn new() -> Self {
-        Self { data: Vec::new() }
+        Self {
+            data: Vec::new(),
+            hashes: H.clone(),
+            bytes_len: 0,
+            chunk: [0; BUFFER_SIZE_U32],
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -78,9 +88,12 @@ impl Sha256 {
         }
     }
 
-    fn add_padding(temp_block_buf: &mut Vec<u8>) {
+    fn add_padding(temp_block_buf: &mut Vec<u8>, len: Option<usize>) {
         // length of message in bits.
-        let l = temp_block_buf.len() * 8;
+        let l = match len {
+            None => temp_block_buf.len() * 8,
+            Some(val) => val * 8,
+        };
 
         // add a bit at the end of message
         temp_block_buf.push(0x80u8);
@@ -102,7 +115,7 @@ impl Sha256 {
     fn copy_buf_u8_to_u32(u8_block: &[u8], u32_block: &mut [u32; BUFFER_SIZE_U32], start: usize) {
         assert!(
             BUFFER_SIZE_U8 <= u8_block.len() - start,
-            "Remaining bits in buffer are {val}, Expected {BUFFER_SIZE_U8} bits",
+            "Remaining bytes in buffer are {val}, Expected {BUFFER_SIZE_U8} bytes",
             val = (u8_block.len() - start)
         );
         for i in 0..BUFFER_SIZE_U32 {
@@ -132,9 +145,80 @@ impl Sha256 {
         temp_block_buf.push((len >> 8) as u8 & 0xff);
         temp_block_buf.push((len >> 0) as u8 & 0xff);
     }
+
+    fn hash_algo(&mut self, data: Option<&[u8]>) {
+        let data = match data {
+            Some(data) => data,
+            None => &self.data[..],
+        };
+        for i in (0..data.len()).step_by(BUFFER_SIZE_U8) {
+            // copy into active block buffer
+            Self::copy_buf_u8_to_u32(&data, &mut self.chunk, i);
+
+            // initialize registers
+            // message schedule array
+            let mut w = [0; MESSAGE_SCHEDULE_SIZE];
+
+            w[0..16].copy_from_slice(&mut self.chunk[..]);
+            for i in 16..MESSAGE_SCHEDULE_SIZE {
+                let sigma_0 = sigma_0(w[i - 15], (7, 18, 3));
+                let sigma_1 = sigma_1(w[i - 2], (17, 19, 10));
+                w[i] = sigma_0
+                    .wrapping_add(sigma_1)
+                    .wrapping_add(w[i - 16])
+                    .wrapping_add(w[i - 7]);
+            }
+            let [mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h] = &self.hashes.clone();
+            Self::compression(
+                &w,
+                (
+                    &mut a, &mut b, &mut c, &mut d, &mut e, &mut f, &mut g, &mut h,
+                ),
+            );
+            self.hashes[0] = a.wrapping_add(self.hashes[0]);
+            self.hashes[1] = b.wrapping_add(self.hashes[1]);
+            self.hashes[2] = c.wrapping_add(self.hashes[2]);
+            self.hashes[3] = d.wrapping_add(self.hashes[3]);
+            self.hashes[4] = e.wrapping_add(self.hashes[4]);
+            self.hashes[5] = f.wrapping_add(self.hashes[5]);
+            self.hashes[6] = g.wrapping_add(self.hashes[6]);
+            self.hashes[7] = h.wrapping_add(self.hashes[7]);
+        }
+    }
 }
 
 impl AhsahHasher for Sha256 {
+
+    fn hash_bufferd<R: Read>(&mut self, handle: &mut R) -> String {
+        let mut buffer = [0; BUFFER_SIZE_U8];
+        while let Ok(n) = handle.read(&mut buffer) {
+            self.bytes_len += n;
+            if n == 0 {
+                break;
+            } else if n == BUFFER_SIZE_U8 {
+                self.hash_algo(Some(&buffer));
+            } else {
+                let mut data = Vec::new();
+                for d in &buffer[..n] {
+                    data.push(*d);
+                }
+                Self::add_padding(&mut data, Some(self.bytes_len));
+                self.hash_algo(Some(&data));
+            }
+        }
+        format!(
+            "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
+            self.hashes[0],
+            self.hashes[1],
+            self.hashes[2],
+            self.hashes[3],
+            self.hashes[4],
+            self.hashes[5],
+            self.hashes[6],
+            self.hashes[7]
+        )
+    }
+
     fn digest(&mut self, data: &[u8]) {
         for byte in data {
             self.data.push(byte.clone());
@@ -146,60 +230,24 @@ impl AhsahHasher for Sha256 {
         // let msg_len: usize = self.data.len();
 
         // A single u32 in this buffer is a word of size 32 bits
-        let mut chunk = [0; BUFFER_SIZE_U32];
+        // let mut chunk = [0; BUFFER_SIZE_U32];
 
         // read message data into temporary buffer.
 
         /* padding message start */
-        Self::add_padding(&mut self.data);
+        Self::add_padding(&mut self.data, None);
         /* padding message end */
-
-        let mut hash_value = H.clone();
-
-        for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
-            // copy into active block buffer
-            Self::copy_buf_u8_to_u32(&mut self.data, &mut chunk, i);
-
-            // initialize registers
-            // message schedule array
-            let mut w = [0; MESSAGE_SCHEDULE_SIZE];
-
-            w[0..16].copy_from_slice(&chunk[..]);
-            for i in 16..MESSAGE_SCHEDULE_SIZE {
-                let sigma_0 = sigma_0(w[i - 15], (7, 18, 3));
-                let sigma_1 = sigma_1(w[i - 2], (17, 19, 10));
-                w[i] = sigma_0
-                    .wrapping_add(sigma_1)
-                    .wrapping_add(w[i - 16])
-                    .wrapping_add(w[i - 7]);
-            }
-            let [mut a, mut b, mut c, mut d, mut e, mut f, mut g, mut h] = hash_value.clone();
-            Self::compression(
-                &w,
-                (
-                    &mut a, &mut b, &mut c, &mut d, &mut e, &mut f, &mut g, &mut h,
-                ),
-            );
-            hash_value[0] = a.wrapping_add(hash_value[0]);
-            hash_value[1] = b.wrapping_add(hash_value[1]);
-            hash_value[2] = c.wrapping_add(hash_value[2]);
-            hash_value[3] = d.wrapping_add(hash_value[3]);
-            hash_value[4] = e.wrapping_add(hash_value[4]);
-            hash_value[5] = f.wrapping_add(hash_value[5]);
-            hash_value[6] = g.wrapping_add(hash_value[6]);
-            hash_value[7] = h.wrapping_add(hash_value[7]);
-        }
-
+        self.hash_algo(None);
         format!(
             "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
-            hash_value[0],
-            hash_value[1],
-            hash_value[2],
-            hash_value[3],
-            hash_value[4],
-            hash_value[5],
-            hash_value[6],
-            hash_value[7]
+            self.hashes[0],
+            self.hashes[1],
+            self.hashes[2],
+            self.hashes[3],
+            self.hashes[4],
+            self.hashes[5],
+            self.hashes[6],
+            self.hashes[7]
         )
     }
 }

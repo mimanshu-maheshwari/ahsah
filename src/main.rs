@@ -1,25 +1,33 @@
-use ahsah::{hashes::AhsahHasher, sha512::Sha512};
+use ahsah::{
+    hashes::AhsahHasher,
+    sha256::Sha256,
+    sha512::Sha512,
+    utils::{Args, HasherKind},
+};
+use clap::Parser;
 use std::{
-    env::args,
     fs::File,
-    io::{BufReader, Read},
+    io::{stdin, BufReader, Read},
+    path::Path,
 };
 
 fn main() {
-    let mut hasher = Sha512::new();
-    let file_path = match args().skip(1).next() {
-        Some(val) => val,
-        None => String::from("res/test.txt"),
-    };
-    let file = File::open(&file_path).expect("Unable to open file");
-    let mut buf_reader = BufReader::new(file);
-    let mut buffer = [0; 1024]; 
-    while let Ok(n) = buf_reader.read(&mut buffer) {
-        if n == 0 {
-            break;
+    let args = Args::parse();
+    let mut handle: Box<dyn Read> = match args.path {
+        Some(path) => {
+            let path = Path::new(&path);
+            Box::new(BufReader::new(File::open(path).unwrap()))
         }
-        hasher.digest(&buffer[..n]);
+        None => Box::new(stdin().lock()),
+    };
+    match args.kind {
+        HasherKind::Sha512 => {
+            let mut hasher = Sha512::new();
+            println!("{}", hasher.hash_bufferd(&mut handle));
+        }
+        HasherKind::Sha256 => {
+            let mut hasher = Sha256::new();
+            println!("{}", hasher.hash_bufferd(&mut handle));
+        }
     }
-    println!("Hashing {} bytes", hasher.len());
-    println!("{}", hasher.finish());
 }

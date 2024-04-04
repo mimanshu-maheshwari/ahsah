@@ -1,42 +1,46 @@
-use ahsah::{utils::{Args, HasherKind}, hashes::AhsahHasher, sha512::Sha512, sha256::Sha256};
+use ahsah::{
+    hashes::AhsahHasher,
+    sha256::Sha256,
+    sha512::Sha512,
+    utils::{Args, HasherKind},
+};
+use clap::Parser;
 use std::{
     fs::File,
     io::{BufReader, Read},
 };
-use clap::Parser;
-
-
 
 fn main() {
     let args = Args::parse();
-    let file = File::open(&args.path).expect("Unable to open file");
-    let mut buf_reader = BufReader::new(file);
-    let mut buffer = [0; 1024]; 
-    match &args.kind {
-        HasherKind::Sha512 =>{
-            let mut hasher = Sha512::new();
-            while let Ok(n) = buf_reader.read(&mut buffer) {
-                if n == 0 {
-                    break;
+    if let Some(path) = &args.path {
+        let file = File::open(path).expect("Unable to open file");
+        let mut buf_reader = BufReader::new(file);
+        let mut buffer = [0; 1024];
+        match &args.kind {
+            HasherKind::Sha512 => {
+                let mut hasher = Sha512::new();
+                while let Ok(n) = buf_reader.read(&mut buffer) {
+                    if n == 0 {
+                        break;
+                    }
+                    hasher.digest(&buffer[..n]);
                 }
-                hasher.digest(&buffer[..n]);
+                println!("Hashing {} bytes", hasher.len());
+                println!("{}", hasher.finish());
             }
-            println!("Hashing {} bytes", hasher.len());
-            println!("{}", hasher.finish());
-
-
-        } ,
-        HasherKind::Sha256 =>{
-            let mut hasher = Sha256::new();
-            while let Ok(n) = buf_reader.read(&mut buffer) {
-                if n == 0 {
-                    break;
+            HasherKind::Sha256 => {
+                let mut hasher = Sha256::new();
+                while let Ok(n) = buf_reader.read(&mut buffer) {
+                    if n == 0 {
+                        break;
+                    }
+                    hasher.digest(&buffer[..n]);
                 }
-                hasher.digest(&buffer[..n]);
+                println!("Hashing {} bytes", hasher.len());
+                println!("{}", hasher.finish());
             }
-            println!("Hashing {} bytes", hasher.len());
-            println!("{}", hasher.finish());
-
-        } ,
+        }
+    } else {
+        panic!("File path not provided");
     }
 }

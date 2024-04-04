@@ -13,7 +13,6 @@ pub enum HasherKind {
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {
-
     /// Type of hasher you want to run.
     // #[arg(short, long)]
     #[arg(short, long, value_enum)]
@@ -21,7 +20,7 @@ pub struct Args {
 
     /// Path to file
     #[arg(short, long)]
-    pub path: String,
+    pub path: Option<String>,
 }
 
 #[allow(unused)]

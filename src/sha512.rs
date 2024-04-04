@@ -1,5 +1,6 @@
 use super::hashes::AhsahHasher;
 use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1};
+use std::io::Read;
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 1024;
@@ -109,6 +110,7 @@ const K: [u64; MESSAGE_SCHEDULE_SIZE] = [
     0x6c44198c4a475817,
 ];
 
+#[derive(Debug)]
 pub struct Sha512 {
     data: Vec<u8>,
 }
@@ -227,6 +229,10 @@ impl Sha512 {
 }
 
 impl AhsahHasher for Sha512 {
+    fn hash_bufferd<R: Read>(&mut self, _handle: &mut R) -> String {
+        todo!("implement the hash_bufferd for sha512");
+    }
+
     fn digest(&mut self, data: &[u8]) {
         for byte in data {
             self.data.push(byte.clone());
