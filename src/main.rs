@@ -34,8 +34,8 @@ fn main() {
         println!(
             "Setup took ({} ns | {} ms | {} s)",
             elapsed.as_nanos(),
-            (elapsed.as_nanos() as f64 / 10e6f64),
-            (elapsed.as_nanos() as f64 / 10e9f64),
+            (elapsed.as_nanos() as f64 / 10e5),
+            (elapsed.as_nanos() as f64 / 10e8),
         );
     }
 
@@ -47,8 +47,8 @@ fn main() {
             "{:?} took ({} ns | {} ms | {} s)",
             &args.algo,
             elapsed.as_nanos(),
-            (elapsed.as_nanos() as f64 / 10e6f64),
-            (elapsed.as_nanos() as f64 / 10e9f64),
+            (elapsed.as_nanos() as f64 / 10e5),
+            (elapsed.as_nanos() as f64 / 10e8),
         );
     }
     println!("{}", hash);
