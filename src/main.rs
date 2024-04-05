@@ -9,10 +9,12 @@ use std::{
     fs::File,
     io::{stdin, BufReader, Read},
     path::Path,
+    time::Instant,
 };
 
 fn main() {
     let args = Args::parse();
+    let now = Instant::now();
 
     let mut handle: Box<dyn Read> = match args.file {
         Some(path) => {
@@ -27,5 +29,27 @@ fn main() {
         Sha256 => Box::new(Sha256::new()),
     };
 
-    println!("{}", hasher.hash_bufferd(&mut handle));
+    let elapsed = now.elapsed();
+    if args.time {
+        println!(
+            "Setup took ({} ns | {} ms | {} s)",
+            elapsed.as_nanos(),
+            (elapsed.as_nanos() as f64 / 10e6f64),
+            (elapsed.as_nanos() as f64 / 10e9f64),
+        );
+    }
+
+    let now = Instant::now();
+    let hash = hasher.hash_bufferd(&mut handle);
+    let elapsed = now.elapsed();
+    if args.time {
+        println!(
+            "{:?} took ({} ns | {} ms | {} s)",
+            &args.algo,
+            elapsed.as_nanos(),
+            (elapsed.as_nanos() as f64 / 10e6f64),
+            (elapsed.as_nanos() as f64 / 10e9f64),
+        );
+    }
+    println!("{}", hash);
 }

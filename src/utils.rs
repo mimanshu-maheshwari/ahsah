@@ -17,9 +17,13 @@ pub struct Args {
     #[arg(short, long, value_enum)]
     pub algo: HashingAlgo,
 
-    /// file path
+    /// File path, if file path is not given will expect stdin
     #[arg(short, long)]
     pub file: Option<String>,
+
+    /// Record time taken by hasher
+    #[arg(short, long)]
+    pub time: bool,
 }
 
 ///Σ0 will work on a
