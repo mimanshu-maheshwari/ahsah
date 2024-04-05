@@ -12,6 +12,7 @@ pub trait AhsahHasher {
 
 pub trait AhsahBufferedHasher {
     fn new() -> Self where Self: Sized;
-    fn hash_bufferd<R: Read>(self: &mut Self, handle: &mut R) -> String;
+    fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String;
+            
     fn len(self: &Self) -> usize; 
 }

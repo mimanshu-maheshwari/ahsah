@@ -1,5 +1,5 @@
 use super::hashes::{AhsahHasher, AhsahBufferedHasher};
-use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1};
+use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1, k_value};
 use std::io::prelude::Read;
 
 /// Message buffer size in bits
@@ -87,7 +87,7 @@ impl Sha256 {
         // add a bit at the end of message
         temp_block_buf.push(0x80u8);
 
-        let k = Self::k_value(l, Some(8), LENGTH_VALUE_PADDING_SIZE_BITS, BUFFER_SIZE_BITS) / 8;
+        let k = k_value(l, Some(8), LENGTH_VALUE_PADDING_SIZE_BITS, BUFFER_SIZE_BITS) / 8;
 
         // add one bit
         // add zero padding
@@ -112,15 +112,6 @@ impl Sha256 {
                 | (u8_block[start + (i * 4) + 1] as u32) << 16
                 | (u8_block[start + (i * 4) + 2] as u32) << 8
                 | (u8_block[start + (i * 4) + 3]) as u32;
-        }
-    }
-
-    /// find the k value for given length in bits
-    /// (L + 1 + k + 64) mod 512 = 0
-    fn k_value(l: usize, one_bit: Option<usize>, padding_size: usize, buffer_size: usize) -> usize {
-        match one_bit {
-            None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
-            Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,
         }
     }
 
@@ -197,7 +188,7 @@ impl AhsahBufferedHasher for Sha256 {
     }
 
 
-    fn hash_bufferd<R: Read>(&mut self, handle: &mut R) -> String {
+    fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
             self.bytes_len += n;

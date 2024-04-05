@@ -1,5 +1,6 @@
-use super::hashes::AhsahHasher;
-use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1};
+use super::hashes::{AhsahBufferedHasher, AhsahHasher};
+use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1, k_value};
+use std::io::Read;
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 1024;
@@ -88,14 +89,18 @@ impl Sha512 {
         }
     }
 
-    fn add_padding(temp_block_buf: &mut Vec<u8>) {
+    fn add_padding(temp_block_buf: &mut Vec<u8>, len: Option<usize>) {
         // length of message in bits.
-        let l = temp_block_buf.len() * 8;
+        let l = match len {
+            None => temp_block_buf.len() * 8,
+            Some(val) => val * 8,
+        };
+
 
         // add a bit at the end of message
         temp_block_buf.push(0x80u8);
 
-        let k = Self::k_value(l, Some(8), LENGTH_VALUE_PADDING_SIZE_BITS, BUFFER_SIZE_BITS) / 8;
+        let k = k_value(l, Some(8), LENGTH_VALUE_PADDING_SIZE_BITS, BUFFER_SIZE_BITS) / 8;
 
         // add one bit
         // add zero padding
@@ -124,15 +129,6 @@ impl Sha512 {
                 | (data[start + (i * 8) + 5] as u64) << 16
                 | (data[start + (i * 8) + 6] as u64) << 8
                 | data[start + (i * 8) + 7] as u64;
-        }
-    }
-
-    /// find the k value for given length in bits
-    /// (L + 1 + k + 64) mod 512 = 0
-    fn k_value(l: usize, one_bit: Option<usize>, padding_size: usize, buffer_size: usize) -> usize {
-        match one_bit {
-            None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
-            Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,
         }
     }
 
@@ -201,6 +197,47 @@ impl Sha512 {
     }
 }
 
+impl AhsahBufferedHasher for Sha512 {
+fn new() -> Self {
+        Self {
+            data: Vec::new(),
+            hashes: H.clone(), 
+            chunk: [0; BUFFER_SIZE_U64],
+            bytes_len: 0,
+        }
+    }
+
+    fn len(&self) -> usize {
+        self.bytes_len
+    }
+
+
+    fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
+        let mut buffer = [0; BUFFER_SIZE_U8];
+        while let Ok(n) = handle.read(&mut buffer) {
+            self.bytes_len += n;
+            if n == 0 {
+                break;
+            } else if n == BUFFER_SIZE_U8 {
+                Self::copy_buf_u8_to_u64(&buffer, &mut self.chunk, 0);
+                self.hash_algo();
+            } else {
+                let mut data = Vec::new();
+                for d in &buffer[..n] {
+                    data.push(*d);
+                }
+                for i in (0..data.len()).step_by(BUFFER_SIZE_U8) {
+                    Self::copy_buf_u8_to_u64(&data, &mut self.chunk, i);
+                    Self::add_padding(&mut data, Some(self.bytes_len));
+                    self.hash_algo();
+                }
+            }
+        }
+        self.to_string()
+    }
+}
+
+
 impl AhsahHasher for Sha512 {
 
     fn new() -> Self {
@@ -225,7 +262,7 @@ impl AhsahHasher for Sha512 {
     /// Main hasher function
     fn finish(&mut self) -> String {
 
-        Self::add_padding(&mut self.data);
+        Self::add_padding(&mut self.data, None);
 
         for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
             Self::copy_buf_u8_to_u64(&self.data, &mut self.chunk, i);

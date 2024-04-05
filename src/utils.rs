@@ -119,3 +119,13 @@ where
 {
     (x & y) ^ (x & z) ^ (y & z)
 }
+    /// find the k value for given length in bits
+    /// (L + 1 + k + 64) mod 512 = 0
+pub(crate) fn k_value(l: usize, one_bit: Option<usize>, padding_size: usize, buffer_size: usize) -> usize {
+        match one_bit {
+            None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
+            Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,
+        }
+    }
+
+

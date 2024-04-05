@@ -1,28 +1,28 @@
-# name: Rust
-# 
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-# 
-# env:
-#   CARGO_TERM_COLOR: always
-# 
-# jobs:
-#   build:
-#     runs-on: windows-latest
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Run tests
-#       run: cargo test --verbose
-#     - name: Build Example file_hasher
-#       run: cargo build -r --example file_hasher
-#     - name: Build Example stdin_hasher
-#       run: cargo build -r --example stdin_hasher
-#     - name: Build Example string_hasher
-#       run: cargo build -r --example string_hasher
-# 
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run tests
+      run: cargo test --verbose
+#    - name: Build Example file_hasher
+#      run: cargo build -r --example file_hasher
+#    - name: Build Example stdin_hasher
+#      run: cargo build -r --example stdin_hasher
+#    - name: Build Example string_hasher
+#      run: cargo build -r --example string_hasher
+ 
 #   release:
 #     name: release ${{ matrix.target }}
 #     runs-on: ubuntu-latest
