@@ -14,7 +14,7 @@ use std::{
 fn main() {
     let args = Args::parse();
 
-    let mut handle: Box<dyn Read> = match args.path {
+    let mut handle: Box<dyn Read> = match args.file {
         Some(path) => {
             let path = Path::new(&path);
             Box::new(BufReader::new(File::open(path).unwrap()))

@@ -17,9 +17,9 @@ pub struct Args {
     #[arg(short, long, value_enum)]
     pub algo: HashingAlgo,
 
-    /// Path to file
+    /// file path
     #[arg(short, long)]
-    pub path: Option<String>,
+    pub file: Option<String>,
 }
 
 ///Σ0 will work on a

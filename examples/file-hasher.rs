@@ -9,7 +9,7 @@ use std::fs::File;
 
 fn main() {
     let args = Args::parse();
-    if let Some(path) = &args.path {
+    if let Some(path) = &args.file {
         let mut handle = Box::new(File::open(path).expect("Unable to open file"));
         let mut hasher: Box<dyn AhsahBufferedHasher> = match &args.algo {
             Sha512 => Box::new(Sha512::new()),
