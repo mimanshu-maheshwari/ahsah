@@ -1,8 +1,17 @@
 use std::io::Read;
 
-pub trait AhsahHasher {
-    fn digest(&mut self, data: &[u8]);
-    fn finish(&mut self) -> String;
+struct Bufferd; 
+struct NotBufferd; 
 
-    fn hash_bufferd<R: Read>(&mut self, handle: &mut R) -> String;
+pub trait AhsahHasher {
+    fn digest(self: &mut Self, data: &[u8]);
+    fn finish(self: &mut Self) -> String;
+    fn new() -> Self where Self: Sized;
+    fn len(self: &Self) -> usize; 
+}
+
+pub trait AhsahBufferedHasher {
+    fn new() -> Self where Self: Sized;
+    fn hash_bufferd<R: Read>(self: &mut Self, handle: &mut R) -> String;
+    fn len(self: &Self) -> usize; 
 }

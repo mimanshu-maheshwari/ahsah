@@ -1,5 +1,5 @@
 use ahsah::{
-    hashes::AhsahHasher,
+    hashes::{AhsahHasher},
     sha256::Sha256,
     sha512::Sha512,
     utils::{Args, HasherKind},
@@ -12,22 +12,23 @@ use std::{
 };
 
 fn main() {
+
     let args = Args::parse();
-    let mut handle: Box<dyn Read> = match args.path {
+
+    let _handle: Box<dyn Read> = match args.path {
         Some(path) => {
             let path = Path::new(&path);
             Box::new(BufReader::new(File::open(path).unwrap()))
         }
         None => Box::new(stdin().lock()),
     };
-    match args.kind {
-        HasherKind::Sha512 => {
-            let mut hasher = Sha512::new();
-            println!("{}", hasher.hash_bufferd(&mut handle));
-        }
-        HasherKind::Sha256 => {
-            let mut hasher = Sha256::new();
-            println!("{}", hasher.hash_bufferd(&mut handle));
-        }
-    }
+
+    let mut hasher: Box<dyn AhsahHasher> = match args.kind {
+        HasherKind::Sha512 => Box::new(Sha512::new()),
+        HasherKind::Sha256 => Box::new(Sha256::new()),
+    };
+
+    // println!("{}", hasher.hash_bufferd(&mut handle));
+    println!("{}", hasher.finish());
+    
 }
