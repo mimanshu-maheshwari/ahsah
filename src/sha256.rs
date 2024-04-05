@@ -114,14 +114,14 @@ impl Sha256 {
     }
 
     fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
-        temp_block_buf.push((len >> 56) as u8 );
-        temp_block_buf.push((len >> 48) as u8 );
-        temp_block_buf.push((len >> 40) as u8 );
-        temp_block_buf.push((len >> 32) as u8 );
-        temp_block_buf.push((len >> 24) as u8 );
-        temp_block_buf.push((len >> 16) as u8 );
-        temp_block_buf.push((len >>  8) as u8 );
-        temp_block_buf.push((len) as u8 );
+        temp_block_buf.push((len >> 56) as u8);
+        temp_block_buf.push((len >> 48) as u8);
+        temp_block_buf.push((len >> 40) as u8);
+        temp_block_buf.push((len >> 32) as u8);
+        temp_block_buf.push((len >> 24) as u8);
+        temp_block_buf.push((len >> 16) as u8);
+        temp_block_buf.push((len >> 8) as u8);
+        temp_block_buf.push((len) as u8);
     }
 
     fn hash_algo(&mut self) {
@@ -182,7 +182,7 @@ impl AhsahBufferedHasher for Sha256 {
 
     fn consumed_len(&self) -> usize {
         self.bytes_len
-    }   
+    }
     fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {

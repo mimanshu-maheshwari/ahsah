@@ -201,18 +201,18 @@ impl Sha512 {
         temp_block_buf.push((len >> 120u128) as u8);
         temp_block_buf.push((len >> 112u128) as u8);
         temp_block_buf.push((len >> 104u128) as u8);
-        temp_block_buf.push((len >>  96u128) as u8);
-        temp_block_buf.push((len >>  88u128) as u8);
-        temp_block_buf.push((len >>  80u128) as u8);
-        temp_block_buf.push((len >>  72u128) as u8);
-        temp_block_buf.push((len >>  64u128) as u8);
-        temp_block_buf.push((len >>  56u128) as u8);
-        temp_block_buf.push((len >>  48u128) as u8);
-        temp_block_buf.push((len >>  40u128) as u8);
-        temp_block_buf.push((len >>  32u128) as u8);
-        temp_block_buf.push((len >>  24u128) as u8);
-        temp_block_buf.push((len >>  16u128) as u8);
-        temp_block_buf.push((len >>   8u128) as u8);
+        temp_block_buf.push((len >> 96u128) as u8);
+        temp_block_buf.push((len >> 88u128) as u8);
+        temp_block_buf.push((len >> 80u128) as u8);
+        temp_block_buf.push((len >> 72u128) as u8);
+        temp_block_buf.push((len >> 64u128) as u8);
+        temp_block_buf.push((len >> 56u128) as u8);
+        temp_block_buf.push((len >> 48u128) as u8);
+        temp_block_buf.push((len >> 40u128) as u8);
+        temp_block_buf.push((len >> 32u128) as u8);
+        temp_block_buf.push((len >> 24u128) as u8);
+        temp_block_buf.push((len >> 16u128) as u8);
+        temp_block_buf.push((len >> 8u128) as u8);
         temp_block_buf.push(len as u8);
     }
 

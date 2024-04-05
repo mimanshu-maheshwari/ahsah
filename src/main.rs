@@ -2,7 +2,7 @@ use ahsah::{
     hashes::AhsahBufferedHasher,
     sha256::Sha256,
     sha512::Sha512,
-    utils::{Args, HasherKind},
+    utils::{Args, HashingAlgo::*},
 };
 use clap::Parser;
 use std::{
@@ -22,9 +22,9 @@ fn main() {
         None => Box::new(stdin().lock()),
     };
 
-    let mut hasher: Box<dyn AhsahBufferedHasher> = match args.kind {
-        HasherKind::Sha512 => Box::new(Sha512::new()),
-        HasherKind::Sha256 => Box::new(Sha256::new()),
+    let mut hasher: Box<dyn AhsahBufferedHasher> = match args.algo {
+        Sha512 => Box::new(Sha512::new()),
+        Sha256 => Box::new(Sha256::new()),
     };
 
     println!("{}", hasher.hash_bufferd(&mut handle));

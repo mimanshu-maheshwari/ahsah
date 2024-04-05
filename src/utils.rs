@@ -3,7 +3,7 @@ use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
 use clap::{Parser, ValueEnum};
 
 #[derive(Debug, ValueEnum, Clone)]
-pub enum HasherKind {
+pub enum HashingAlgo {
     Sha512,
     Sha256,
 }
@@ -15,7 +15,7 @@ pub struct Args {
     /// Type of hasher you want to run.
     // #[arg(short, long)]
     #[arg(short, long, value_enum)]
-    pub kind: HasherKind,
+    pub algo: HashingAlgo,
 
     /// Path to file
     #[arg(short, long)]
