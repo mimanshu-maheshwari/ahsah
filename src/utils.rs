@@ -1,4 +1,3 @@
-use std::fmt::LowerHex;
 use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
 
 use clap::{Parser, ValueEnum};
@@ -21,18 +20,6 @@ pub struct Args {
     /// Path to file
     #[arg(short, long)]
     pub path: Option<String>,
-}
-
-#[allow(unused)]
-pub(crate) fn print_buf<T>(buf: &[T]) -> ()
-where
-    T: LowerHex,
-{
-    print!("\n[ ");
-    for i in 0..buf.len() {
-        print!("{:x} ", buf[i]);
-    }
-    println!("]");
 }
 
 ///Σ0 will work on a
@@ -119,13 +106,16 @@ where
 {
     (x & y) ^ (x & z) ^ (y & z)
 }
-    /// find the k value for given length in bits
-    /// (L + 1 + k + 64) mod 512 = 0
-pub(crate) fn k_value(l: usize, one_bit: Option<usize>, padding_size: usize, buffer_size: usize) -> usize {
-        match one_bit {
-            None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
-            Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,
-        }
+/// find the k value for given length in bits
+/// (L + 1 + k + 64) mod 512 = 0
+pub(crate) fn k_value(
+    l: usize,
+    one_bit: Option<usize>,
+    padding_size: usize,
+    buffer_size: usize,
+) -> usize {
+    match one_bit {
+        None => (buffer_size - ((l + padding_size + 1) % buffer_size)) % buffer_size,
+        Some(v) => (buffer_size - ((l + padding_size + v) % buffer_size)) % buffer_size,
     }
-
-
+}

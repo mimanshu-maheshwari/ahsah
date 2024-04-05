@@ -1,45 +1,21 @@
 use ahsah::{
-    hashes::AhsahHasher,
+    hashes::AhsahBufferedHasher,
     sha256::Sha256,
     sha512::Sha512,
     utils::{Args, HasherKind},
 };
 use clap::Parser;
-use std::{
-    fs::File,
-    io::{BufReader, Read},
-};
+use std::fs::File ;
 
 fn main() {
     let args = Args::parse();
     if let Some(path) = &args.path {
-        let file = File::open(path).expect("Unable to open file");
-        let mut buf_reader = BufReader::new(file);
-        let mut buffer = [0; 1024];
-        match &args.kind {
-            HasherKind::Sha512 => {
-                let mut hasher = Sha512::new();
-                while let Ok(n) = buf_reader.read(&mut buffer) {
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.digest(&buffer[..n]);
-                }
-                println!("Hashing {} bytes", hasher.len());
-                println!("{}", hasher.finish());
-            }
-            HasherKind::Sha256 => {
-                let mut hasher = Sha256::new();
-                while let Ok(n) = buf_reader.read(&mut buffer) {
-                    if n == 0 {
-                        break;
-                    }
-                    hasher.digest(&buffer[..n]);
-                }
-                println!("Hashing {} bytes", hasher.len());
-                println!("{}", hasher.finish());
-            }
-        }
+        let mut handle = Box::new(File::open(path).expect("Unable to open file"));
+        let mut hasher: Box<dyn AhsahBufferedHasher> = match &args.kind {
+            HasherKind::Sha512 => Box::new(Sha512::new()),
+            HasherKind::Sha256 => Box::new(Sha256::new())
+        };
+        println!("{}", hasher.hash_bufferd(&mut handle));
     } else {
         panic!("File path not provided");
     }

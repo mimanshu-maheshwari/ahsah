@@ -12,7 +12,6 @@ use std::{
 };
 
 fn main() {
-
     let args = Args::parse();
 
     let mut handle: Box<dyn Read> = match args.path {
@@ -29,6 +28,4 @@ fn main() {
     };
 
     println!("{}", hasher.hash_bufferd(&mut handle));
-    // println!("{}", hasher.finish());
-    
 }

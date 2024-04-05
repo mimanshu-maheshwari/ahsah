@@ -1,5 +1,5 @@
-use super::hashes::{AhsahHasher, AhsahBufferedHasher};
-use super::utils::{ch, maj, sigma_0, sigma_1, sum_0, sum_1, k_value};
+use super::hashes::{AhsahBufferedHasher, AhsahHasher};
+use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::io::prelude::Read;
 
 /// Message buffer size in bits
@@ -40,8 +40,6 @@ pub struct Sha256 {
 }
 
 impl Sha256 {
-
-
     fn compression(
         w: &[u32; MESSAGE_SCHEDULE_SIZE],
         (a, b, c, d, e, f, g, h): (
@@ -53,8 +51,8 @@ impl Sha256 {
             &mut u32,
             &mut u32,
             &mut u32,
-            ),
-            ) {
+        ),
+    ) {
         for i in 0..MESSAGE_SCHEDULE_SIZE {
             let sum_1 = sum_1(*e, (6, 11, 25));
             let ch = ch(*e, *f, *g);
@@ -108,7 +106,7 @@ impl Sha256 {
             val = (u8_block.len() - start)
         );
         for i in 0..BUFFER_SIZE_U32 {
-            u32_block[i] = (u8_block[start + (i * 4) + 0] as u32) << 24
+            u32_block[i] = (u8_block[start + (i * 4)] as u32) << 24
                 | (u8_block[start + (i * 4) + 1] as u32) << 16
                 | (u8_block[start + (i * 4) + 2] as u32) << 8
                 | (u8_block[start + (i * 4) + 3]) as u32;
@@ -116,14 +114,14 @@ impl Sha256 {
     }
 
     fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
-        temp_block_buf.push((len >> 56) as u8 & 0xff);
-        temp_block_buf.push((len >> 48) as u8 & 0xff);
-        temp_block_buf.push((len >> 40) as u8 & 0xff);
-        temp_block_buf.push((len >> 32) as u8 & 0xff);
-        temp_block_buf.push((len >> 24) as u8 & 0xff);
-        temp_block_buf.push((len >> 16) as u8 & 0xff);
-        temp_block_buf.push((len >> 8) as u8 & 0xff);
-        temp_block_buf.push((len >> 0) as u8 & 0xff);
+        temp_block_buf.push((len >> 56) as u8 );
+        temp_block_buf.push((len >> 48) as u8 );
+        temp_block_buf.push((len >> 40) as u8 );
+        temp_block_buf.push((len >> 32) as u8 );
+        temp_block_buf.push((len >> 24) as u8 );
+        temp_block_buf.push((len >> 16) as u8 );
+        temp_block_buf.push((len >>  8) as u8 );
+        temp_block_buf.push((len) as u8 );
     }
 
     fn hash_algo(&mut self) {
@@ -131,7 +129,7 @@ impl Sha256 {
         // message schedule array
         let mut w = [0; MESSAGE_SCHEDULE_SIZE];
 
-        w[0..16].copy_from_slice(&mut self.chunk[..]);
+        w[0..16].copy_from_slice(&self.chunk[..]);
         for i in 16..MESSAGE_SCHEDULE_SIZE {
             let sigma_0 = sigma_0(w[i - 15], (7, 18, 3));
             let sigma_1 = sigma_1(w[i - 2], (17, 19, 10));
@@ -145,8 +143,8 @@ impl Sha256 {
             &w,
             (
                 &mut a, &mut b, &mut c, &mut d, &mut e, &mut f, &mut g, &mut h,
-                ),
-                );
+            ),
+        );
         self.hashes[0] = a.wrapping_add(self.hashes[0]);
         self.hashes[1] = b.wrapping_add(self.hashes[1]);
         self.hashes[2] = c.wrapping_add(self.hashes[2]);
@@ -157,7 +155,7 @@ impl Sha256 {
         self.hashes[7] = h.wrapping_add(self.hashes[7]);
     }
 
-    fn to_string(&self) -> String {
+    fn get_hash_string(&self) -> String {
         format!(
             "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
             self.hashes[0],
@@ -173,21 +171,18 @@ impl Sha256 {
 }
 
 impl AhsahBufferedHasher for Sha256 {
-
     fn new() -> Self {
         Self {
             data: Vec::new(),
-            hashes: H.clone(),
+            hashes: H,
             bytes_len: 0,
             chunk: [0; BUFFER_SIZE_U32],
         }
     }
 
-    fn len(&self) -> usize {
+    fn consumed_len(&self) -> usize {
         self.bytes_len
-    }
-
-
+    }   
     fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
@@ -202,35 +197,34 @@ impl AhsahBufferedHasher for Sha256 {
                 for d in &buffer[..n] {
                     data.push(*d);
                 }
+                Self::add_padding(&mut data, Some(self.bytes_len));
                 for i in (0..data.len()).step_by(BUFFER_SIZE_U8) {
                     Self::copy_buf_u8_to_u32(&data, &mut self.chunk, i);
-                    Self::add_padding(&mut data, Some(self.bytes_len));
                     self.hash_algo();
                 }
             }
         }
-       self.to_string()
+        self.get_hash_string()
     }
 }
 
 impl AhsahHasher for Sha256 {
-
     fn new() -> Self {
         Self {
             data: Vec::new(),
-            hashes: H.clone(),
+            hashes: H,
             bytes_len: 0,
             chunk: [0; BUFFER_SIZE_U32],
         }
     }
 
-    fn len(&self) -> usize {
+    fn consumed_len(&self) -> usize {
         self.data.len()
     }
 
     fn digest(&mut self, data: &[u8]) {
         for byte in data {
-            self.data.push(byte.clone());
+            self.data.push(*byte);
         }
     }
 
@@ -241,7 +235,7 @@ impl AhsahHasher for Sha256 {
         for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
             Self::copy_buf_u8_to_u32(&self.data, &mut self.chunk, i);
             self.hash_algo();
-        }    
-        self.to_string()
+        }
+        self.get_hash_string()
     }
 }

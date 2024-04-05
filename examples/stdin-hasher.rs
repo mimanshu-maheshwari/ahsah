@@ -8,6 +8,6 @@ fn main() {
         let line = line.expect("Unable to read line from stdin");
         hasher.digest(&line.as_bytes());
     }
-    println!("Hashing {} bytes.", hasher.len());
+    println!("Hashing {} bytes.", hasher.consumed_len());
     println!("{}", hasher.finish());
 }
