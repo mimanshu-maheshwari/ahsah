@@ -1,4 +1,7 @@
-name: Release Trigger
+name: Release
+
+permissions: 
+  contents: write
 
 on: 
   push:
@@ -18,10 +21,13 @@ jobs:
         include: 
           - target: x86_64-pc-windows-gnu
             archive: zip 
+            os: windows-latest
           - target: x86_64-unknown-linux-musl
             archive: tar.gz tar.xz tar.zst
+            os: ubuntu-latest
 #          - target: x86_64-apple-darwin
 #            archive: zip
+#            os: macos-latest
     steps:
       - uses: actions/checkout@main 
         name: Checkout to main branch
