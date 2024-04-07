@@ -119,6 +119,7 @@ sys     0m0.000s
 
 In future will implement more algorithms
 
-## Extra Unrelated Links
+## Release actions github
 * https://github.com/marketplace/actions/build-and-upload-rust-binary-to-github-releases
+* https://github.com/marketplace/actions/rust-release-binary
 * https://github.com/marketplace/actions/rust-release-binary

@@ -25,10 +25,21 @@ jobs:
     steps:
       - uses: actions/checkout@main 
         name: Checkout to main branch
-      - name: Compile and release
+
+      - name: Compile
+        id: compile
         uses: rust-build/rust-build.action@v1.4.5 
         env: 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with: 
           RUSTTARGET: ${{ matrix.target }}
           ARCHIVE_TYPES: ${{ matrix.archive }}
+          UPLOAD_MODE: none
+
+      - name: Upload Artifact 
+        uses: actions/upload-artifact@v3 
+        with: 
+          name: Binary 
+          path: |
+            ${{ steps.compile.outputs.BUILT_ARCHIVE }}
+            ${{ steps.compile.outputs.BUILT_CHECKSUM }}
