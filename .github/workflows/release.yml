@@ -30,9 +30,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ github.run_number }}`,
+              sha: context.sha
+            })
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
-          tag_name: ${{ github.run_number }}
           bin: ahsah
           token: ${{ secrets.GITHUB_TOKEN }}
           target: ${{ matrix.target }}
