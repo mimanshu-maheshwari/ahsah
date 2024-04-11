@@ -1,6 +1,6 @@
 [package]
 name = "ahsah"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Mimanshu Maheshwari maheshwarimimanshu@gmail.com"]
 description = "A library of hashing functions in rust"
