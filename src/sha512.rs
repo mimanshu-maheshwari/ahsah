@@ -1,4 +1,4 @@
-use super::hashes::{AhsahBufferedHasher, AhsahHasher};
+use super::hashes::{BufferedHasher, Hasher};
 use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::io::Read;
 
@@ -260,7 +260,7 @@ impl Sha512 {
     }
 }
 
-impl AhsahBufferedHasher for Sha512 {
+impl BufferedHasher for Sha512 {
     fn new() -> Self {
         Self {
             data: Vec::new(),
@@ -299,7 +299,7 @@ impl AhsahBufferedHasher for Sha512 {
     }
 }
 
-impl AhsahHasher for Sha512 {
+impl Hasher for Sha512 {
     fn new() -> Self {
         Self {
             data: Vec::new(),

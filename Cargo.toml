@@ -2,10 +2,20 @@
 name = "ahsah"
 version = "0.1.0"
 edition = "2021"
-authors = ["https://github.com/mimanshu-maheshwari"]
-default-run = "ahsah"
+authors = ["Mimanshu Maheshwari maheshwarimimanshu@gmail.com"]
+description = "A library of hashing functions in rust"
+repository = "https://github.com/mimanshu-maheshwari/ahsah"
+license = "MIT OR Apache-2.0"
+keywords = ["hash", "sha", "sha256", "sha512","crypto"]
+categories = ["algorithms", "cryptography", "cryptography::cryptocurrencies", "encoding"]
+exclude = ["/notes/**", "/docs/**"]
+publish = true 
+#default-run = "ahsah"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lints.rust]
+unsafe_code = "forbid"
 
 # libs
 # [lib]

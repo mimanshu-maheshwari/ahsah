@@ -1,5 +1,5 @@
 use ahsah::{
-    hashes::AhsahBufferedHasher,
+    hashes::BufferedHasher,
     sha256::Sha256,
     sha512::Sha512,
     utils::{Args, HashingAlgo::*},
@@ -24,7 +24,7 @@ fn main() {
         None => Box::new(stdin().lock()),
     };
 
-    let mut hasher: Box<dyn AhsahBufferedHasher> = match args.algo {
+    let mut hasher: Box<dyn BufferedHasher> = match args.algo {
         Sha512 => Box::new(Sha512::new()),
         Sha256 => Box::new(Sha256::new()),
     };

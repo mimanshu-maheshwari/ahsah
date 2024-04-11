@@ -1,4 +1,4 @@
-use super::hashes::{AhsahBufferedHasher, AhsahHasher};
+use super::hashes::{BufferedHasher, Hasher};
 use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::io::prelude::Read;
 
@@ -113,6 +113,7 @@ impl Sha256 {
         }
     }
 
+    /// copy the length of data to buffer.
     fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
         temp_block_buf.push((len >> 56) as u8);
         temp_block_buf.push((len >> 48) as u8);
@@ -124,6 +125,7 @@ impl Sha256 {
         temp_block_buf.push((len) as u8);
     }
 
+    /// hashing algorithm 
     fn hash_algo(&mut self) {
         // initialize registers
         // message schedule array
@@ -170,7 +172,8 @@ impl Sha256 {
     }
 }
 
-impl AhsahBufferedHasher for Sha256 {
+impl BufferedHasher for Sha256 {
+    /// create a new instance of hasher
     fn new() -> Self {
         Self {
             data: Vec::new(),
@@ -180,9 +183,12 @@ impl AhsahBufferedHasher for Sha256 {
         }
     }
 
+    /// the length of data that is hashed in bytes
     fn consumed_len(&self) -> usize {
         self.bytes_len
     }
+
+    /// hashing algorithm
     fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
@@ -208,7 +214,7 @@ impl AhsahBufferedHasher for Sha256 {
     }
 }
 
-impl AhsahHasher for Sha256 {
+impl Hasher for Sha256 {
     fn new() -> Self {
         Self {
             data: Vec::new(),

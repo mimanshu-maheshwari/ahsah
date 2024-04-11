@@ -3,7 +3,7 @@ use std::io::Read;
 // struct Bufferd;
 // struct NotBufferd;
 
-pub trait AhsahHasher {
+pub trait Hasher {
     fn digest(&mut self, data: &[u8]);
     fn finish(&mut self) -> String;
     fn new() -> Self
@@ -12,7 +12,7 @@ pub trait AhsahHasher {
     fn consumed_len(&self) -> usize;
 }
 
-pub trait AhsahBufferedHasher {
+pub trait BufferedHasher {
     fn new() -> Self
     where
         Self: Sized;
