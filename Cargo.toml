@@ -28,21 +28,29 @@ unsafe_code = "forbid"
 name = "hash_tests"
 path = "tests/hash-tests.rs"
 
-[[example]]
-name = "string_hasher"
-path = "examples/string-hasher.rs"
-
-[[example]]
-name = "stdin_hasher"
-path = "examples/stdin-hasher.rs"
-
-[[example]]
-name = "file_hasher"
-path = "examples/file-hasher.rs"
-
-[[example]]
-name = "reader_hasher"
+#[[example]]
+#name = "string_hasher"
+#path = "examples/string-hasher.rs"
+#
+#[[example]]
+#name = "stdin_hasher"
+#path = "examples/stdin-hasher.rs"
+#
+#[[example]]
+#name = "file_hasher"
+#path = "examples/file-hasher.rs"
+#
+#[[example]]
+#name = "reader_hasher"
+#path = "examples/reader-hasher.rs"
+[[example]] 
+name = "reader-hasher" 
+required-features = ["args"]
 path = "examples/reader-hasher.rs"
 
+[features]
+args = ["dep:clap"]
+
 [dependencies]
-clap = {version = "4.5.4", features = ["derive"]}
+clap = {version = "4.5.4", features = ["derive"], optional = true}
+

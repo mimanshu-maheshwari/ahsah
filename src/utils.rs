@@ -1,14 +1,16 @@
 use std::ops::{BitAnd, BitOr, BitXor, Not, Shl, Shr};
 
+#[cfg(feature = "args")]
 use clap::{Parser, ValueEnum};
 
+#[cfg(feature = "args")]
 #[derive(Debug, ValueEnum, Clone)]
 pub enum HashingAlgo {
     Sha512,
     Sha256,
 }
 
-/// Simple program to greet a person
+#[cfg(feature = "args")]
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {
