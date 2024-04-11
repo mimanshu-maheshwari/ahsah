@@ -31,5 +31,9 @@ path = "examples/stdin-hasher.rs"
 name = "file_hasher"
 path = "examples/file-hasher.rs"
 
+[[example]]
+name = "reader_hasher"
+path = "examples/reader-hasher.rs"
+
 [dependencies]
 clap = {version = "4.5.4", features = ["derive"]}

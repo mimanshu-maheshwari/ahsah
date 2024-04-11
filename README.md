@@ -1,18 +1,6 @@
 # AHSAH: Hashing Algorithm implementations
 
-Implementation of SHA-256 and SHA-512 algorithm in rust as library.
-
-Currently `file_hasher` only supports string data in files. Binary data is not supported.
-But library takes bytes only so, you can create a binary file hasher as well.
-
-In release you can download hashers for sha256:
-```console
-$ ./file_hasher.exe <filename>
-$ ./string_hasher.exe "string"
-$ ./stdin_hasher.exe <<< "datastring"
-$ echo "data" | ./stdin_hasher.exe 
-$ cat filename | ./stdin_hasher.exe
-```
+A collection of hashing algorithms which support buffered hashing through Read trait.
 
 ## Example: 
 * Buffered example: 
@@ -50,7 +38,7 @@ $ cat filename | ./stdin_hasher.exe
 	}
 	```
 
-* SHA 256
+* SHA 256 Unbuffered
   ```rust
   use ahsah::{hashes::AhsahHasher, sha256::Sha256};
   use std::env::args;
@@ -72,7 +60,7 @@ $ cat filename | ./stdin_hasher.exe
 	▶ cargo r -q -- "abc"
 	ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
 	```
-* SHA 512
+* SHA 512 Unbuffered
   ```rust
   use ahsah::{hashes::AhsahHasher, sha512::Sha512};
   use std::env::args;
@@ -101,23 +89,15 @@ $ cat filename | ./stdin_hasher.exe
 ▶ du -b data.zip
 3326642876      data.zip
 ➜ tests ⚡                                                                                                   22:58:34
-▶ time ./ahsah.exe -a sha256 -f data.zip
+▶ ./ahsah.exe -a sha256 -f data.zip
 32ce88a708c5eef77796194c408a653094bd28f9114eb521825c66fb6df8d12f
 
-real    0m15.968s
-user    0m0.000s
-sys     0m0.000s
-
 ➜ tests ⚡                                                                                                   22:58:53
-▶ time ./ahsah.exe -a sha512 -f data.zip
+▶ ./ahsah.exe -a sha512 -f data.zip
 5dfe1446c13d7b46e59bbc78b8b72c9badc13ba6172647c451ccdf47dd2ccd15d156aa221cc8c2feb9bbb03bc6e8a7c5212e60d25d3ebbd4876ae8e96b1b7bce
-
-real    0m10.830s
-user    0m0.000s
-sys     0m0.000s
 ```
 
-In future will implement more algorithms
+In future will implement more algorithms, but currently we only have Sha256 and Sha512.
 
 ## Release actions github
 * https://github.com/marketplace/actions/build-and-upload-rust-binary-to-github-releases
