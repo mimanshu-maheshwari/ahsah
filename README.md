@@ -82,24 +82,22 @@ A collection of hashing algorithms which support buffered hashing through Read t
 	▶ cargo r -q -- "abc"
 	ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f
 	```
-### `ahsah.exe` usage:
-
-```console
-➜ tests ⚡                                                                                                   22:58:32
-▶ du -b data.zip
-3326642876      data.zip
-➜ tests ⚡                                                                                                   22:58:34
-▶ ./ahsah.exe -a sha256 -f data.zip
-32ce88a708c5eef77796194c408a653094bd28f9114eb521825c66fb6df8d12f
-
-➜ tests ⚡                                                                                                   22:58:53
-▶ ./ahsah.exe -a sha512 -f data.zip
-5dfe1446c13d7b46e59bbc78b8b72c9badc13ba6172647c451ccdf47dd2ccd15d156aa221cc8c2feb9bbb03bc6e8a7c5212e60d25d3ebbd4876ae8e96b1b7bce
-```
+* `reader-hasher.exe` example:
+	
+	```console
+	➜ tests ⚡                                                                                                   22:58:32
+	▶ du -b data.zip
+	3326642876      data.zip
+	➜ tests ⚡                                                                                                   22:58:34
+	▶ ./reader-hasher.exe -a sha256 -f data.zip
+	32ce88a708c5eef77796194c408a653094bd28f9114eb521825c66fb6df8d12f
+	
+	➜ tests ⚡                                                                                                   22:58:53
+	▶ ./reader-hasher.exe -a sha512 -f data.zip
+	5dfe1446c13d7b46e59bbc78b8b72c9badc13ba6172647c451ccdf47dd2ccd15d156aa221cc8c2feb9bbb03bc6e8a7c5212e60d25d3ebbd4876ae8e96b1b7bce
+	```
 
 In future will implement more algorithms, but currently we only have Sha256 and Sha512.
 
-## Release actions github
-* https://github.com/marketplace/actions/build-and-upload-rust-binary-to-github-releases
-* https://github.com/marketplace/actions/rust-release-binary
-* https://github.com/marketplace/actions/upload-files-to-a-github-release
+# References: 
+* [wiki](https://en.wikipedia.org/wiki/SHA-2)
