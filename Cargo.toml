@@ -11,6 +11,7 @@ keywords = ["hash", "sha", "sha256", "sha512","crypto"]
 categories = ["algorithms", "cryptography", "cryptography::cryptocurrencies", "encoding"]
 exclude = ["/notes/**", "/docs/**"]
 
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lints.rust]
