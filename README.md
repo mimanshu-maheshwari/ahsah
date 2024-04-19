@@ -6,7 +6,7 @@ A collection of hashing algorithms which support buffered hashing through Read t
 * Buffered example: 
 	```rust
 	use ahsah::{
-			hashes::AhsahBufferedHasher,
+			hashes::BufferedHasher,
 			sha256::Sha256,
 			sha512::Sha512,
 			utils::{Args, HashingAlgo::*},
@@ -40,7 +40,7 @@ A collection of hashing algorithms which support buffered hashing through Read t
 
 * SHA 256 Unbuffered
   ```rust
-  use ahsah::{hashes::AhsahHasher, sha256::Sha256};
+  use ahsah::{hashes::Hasher, sha256::Sha256};
   use std::env::args;
   
   fn main() {
@@ -62,7 +62,7 @@ A collection of hashing algorithms which support buffered hashing through Read t
 	```
 * SHA 512 Unbuffered
   ```rust
-  use ahsah::{hashes::AhsahHasher, sha512::Sha512};
+  use ahsah::{hashes::Hasher, sha512::Sha512};
   use std::env::args;
   
   fn main() {
