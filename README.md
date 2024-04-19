@@ -29,7 +29,7 @@ A collection of hashing algorithms which support buffered hashing through Read t
 					None => Box::new(stdin().lock()),
 			};
 
-			let mut hasher: Box<dyn AhsahBufferedHasher> = match args.algo {
+			let mut hasher: Box<dyn BufferedHasher> = match args.algo {
 					Sha512 => Box::new(Sha512::new()),
 					Sha256 => Box::new(Sha256::new()),
 			};
