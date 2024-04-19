@@ -2,7 +2,9 @@
 
 A collection of hashing algorithms which support buffered hashing through Read trait.
 
+
 ## Example: 
+> `ahsah::utils::Args` provides flags like `--algo`, `--time` and `--file`
 * Buffered example: 
 	```rust
 	use ahsah::{
