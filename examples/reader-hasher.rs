@@ -1,5 +1,5 @@
 use ahsah::utils::{Args, HashingAlgo::*};
-use ahsah::{hashes::BufferedHasher, sha256::Sha256, sha512::Sha512};
+use ahsah::hashes::HashBuilder;
 use clap::Parser;
 use std::{
     fs::File,
@@ -20,23 +20,11 @@ fn main() {
         None => Box::new(stdin().lock()),
     };
 
-    let mut hasher: Box<dyn BufferedHasher> = match args.algo {
-        Sha512 => Box::new(Sha512::new()),
-        Sha256 => Box::new(Sha256::new()),
+    let hash = match args.algo {
+        Sha512 => HashBuilder::sha512().reader().read(&mut handle),
+        Sha256 => HashBuilder::sha256().reader().read(&mut handle),
     };
 
-    let elapsed = now.elapsed();
-    if args.time {
-        println!(
-            "Setup took ({} ns | {} ms | {} s)",
-            elapsed.as_nanos(),
-            (elapsed.as_nanos() as f64 / 10e5),
-            (elapsed.as_nanos() as f64 / 10e8),
-        );
-    }
-
-    let now = Instant::now();
-    let hash = hasher.hash_bufferd(&mut handle);
     let elapsed = now.elapsed();
     if args.time {
         println!(

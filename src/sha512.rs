@@ -139,7 +139,7 @@ impl Hasher<Sha512, Generic> {
         hasher
     }
 
-    fn digester(self) -> Hasher<Sha512, WithoutReader> {
+    pub fn digester(self) -> Hasher<Sha512, WithoutReader> {
         let hasher: Hasher<Sha512, WithoutReader> = Hasher::<Sha512, WithoutReader> {
             algo: self.algo,
             phantom: PhantomData,
@@ -299,11 +299,11 @@ impl Sha512 {
 }
 
 impl Hasher<Sha512, WithReader> {
-    fn consumed_len(&self) -> usize {
+    pub fn consumed_len(&self) -> usize {
         self.algo.bytes_len
     }
 
-    fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
+    pub fn read(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
             self.algo.bytes_len += n;
@@ -329,18 +329,18 @@ impl Hasher<Sha512, WithReader> {
 }
 
 impl Hasher<Sha512, WithoutReader> {
-    fn consumed_len(&self) -> usize {
+    pub fn consumed_len(&self) -> usize {
         self.algo.data.len()
     }
 
-    fn digest(&mut self, data: &[u8]) {
+    pub fn digest(&mut self, data: &[u8]) {
         for byte in data {
             self.algo.data.push(*byte);
         }
     }
 
     /// Main hasher function
-    fn finish(&mut self) -> String {
+    pub fn finalize(&mut self) -> String {
         Sha512::add_padding(&mut self.algo.data, None);
 
         for i in (0..self.algo.data.len()).step_by(BUFFER_SIZE_U8) {

@@ -202,7 +202,7 @@ impl Hasher<Sha256, Generic> {
         };
         hasher
     }
-    fn digester(self) -> Hasher<Sha256, WithoutReader> {
+    pub fn digester(self) -> Hasher<Sha256, WithoutReader> {
         let hasher: Hasher<Sha256, WithoutReader> = Hasher::<Sha256, WithoutReader> {
             algo: self.algo,
             phantom: PhantomData,
@@ -213,12 +213,12 @@ impl Hasher<Sha256, Generic> {
 
 impl Hasher<Sha256, WithReader> {
     /// the length of data that is hashed in bytes
-    fn consumed_len(&self) -> usize {
+    pub fn consumed_len(&self) -> usize {
         self.algo.bytes_len
     }
 
     /// hashing algorithm
-    fn read(&mut self, handle: &mut dyn Read) -> String {
+    pub fn read(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
             self.algo.bytes_len += n;
@@ -244,18 +244,18 @@ impl Hasher<Sha256, WithReader> {
 }
 
 impl Hasher<Sha256, WithoutReader> {
-    fn consumed_len(&self) -> usize {
+    pub fn consumed_len(&self) -> usize {
         self.algo.data.len()
     }
 
-    fn digest(&mut self, data: &[u8]) {
+    pub fn digest(&mut self, data: &[u8]) {
         for byte in data {
             self.algo.data.push(*byte);
         }
     }
 
     /// Main hasher function
-    fn finish(&mut self) -> String {
+    pub fn finalize(&mut self) -> String {
         Sha256::add_padding(&mut self.algo.data, None);
 
         for i in (0..self.algo.data.len()).step_by(BUFFER_SIZE_U8) {

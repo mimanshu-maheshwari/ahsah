@@ -1,9 +1,8 @@
 use ahsah::{
-    hashes::BufferedHasher,
-    sha256::Sha256,
-    sha512::Sha512,
+    hashes::HashBuilder,
     utils::{Args, HashingAlgo::*},
 };
+
 use clap::Parser;
 use std::fs::File;
 
@@ -11,11 +10,11 @@ fn main() {
     let args = Args::parse();
     if let Some(path) = &args.file {
         let mut handle = Box::new(File::open(path).expect("Unable to open file"));
-        let mut hasher: Box<dyn BufferedHasher> = match &args.algo {
-            Sha512 => Box::new(Sha512::new()),
-            Sha256 => Box::new(Sha256::new()),
+        let hash = match &args.algo {
+            Sha512 => HashBuilder::sha512().reader().read(&mut handle),
+            Sha256 => HashBuilder::sha256().reader().read(&mut handle),
         };
-        println!("{}", hasher.hash_bufferd(&mut handle));
+        println!("{}", hash);
     } else {
         panic!("File path not provided");
     }
