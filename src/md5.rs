@@ -107,10 +107,10 @@ impl MD5 {
             val = (u8_block.len() - start)
         );
         for i in 0..BUFFER_SIZE_U32 {
-            u32_block[i] = (u8_block[start + (i * 4)] as u32) << 24
-                | (u8_block[start + (i * 4) + 1] as u32) << 16
-                | (u8_block[start + (i * 4) + 2] as u32) << 8
-                | (u8_block[start + (i * 4) + 3]) as u32;
+            u32_block[i] = (u8_block[start + (i * 4)    ]  as u32) << 24
+                         | (u8_block[start + (i * 4) + 1]  as u32) << 16
+                         | (u8_block[start + (i * 4) + 2]  as u32) << 8
+                         | (u8_block[start + (i * 4) + 3]) as u32;
         }
     }
 
@@ -135,22 +135,22 @@ impl MD5 {
             let g: u32;
             if i <= 15 {
                 f = (*b & *c) | (!*b & *d);
-                g = i % 16;
+                g = i;
             } else if 16 <= i && i <= 31 {
                 f = (*d & *b) | (!*d & *c);
-                g = (5 * i + 1) % 16;
+                g = ((5 * i) + 1) % 16;
             } else if 32 <= i && i <= 47 {
                 f = *b ^ *c ^ *d;
-                g = (3 * i + 5) % 16;
+                g = ((3 * i) + 5) % 16;
             } else {
                 f = *c ^ (*b | !*d);
                 g = (7 * i) % 16;
             }
-            f = f + *a + K[i as usize] + w[g as usize]; // m[g] must be a 32-bit block
+            f = f.wrapping_add(*a).wrapping_add(K[i as usize]).wrapping_add(w[g as usize]); // m[g] must be a 32-bit block
             *a = *d;
             *d = *c;
             *c = *b;
-            *b = *b + left_rotate(f, S[i as usize]);
+            *b = b.wrapping_add(left_rotate(f, S[i as usize]));
         }
     }
     fn hash_algo(&mut self) {
