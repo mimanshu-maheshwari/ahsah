@@ -8,6 +8,8 @@ use clap::{Parser, ValueEnum};
 pub enum HashingAlgo {
     Sha512,
     Sha256,
+    //MD5,
+    //Undefined,
 }
 
 #[cfg(feature = "args")]

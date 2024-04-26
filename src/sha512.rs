@@ -1,6 +1,7 @@
-use super::hashes::{BufferedHasher, Hasher};
+use crate::hashes::{Generic, Hasher, WithReader, WithoutReader};
+
 use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
-use std::io::Read;
+use std::{io::Read, marker::PhantomData};
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 1024;
@@ -110,7 +111,7 @@ const K: [u64; MESSAGE_SCHEDULE_SIZE] = [
     0x6c44198c4a475817,
 ];
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Sha512 {
     data: Vec<u8>,
     hashes: [u64; HASH_SIZE_U64],
@@ -118,7 +119,44 @@ pub struct Sha512 {
     bytes_len: usize,
 }
 
+impl Default for Sha512 {
+    fn default() -> Self {
+        Self {
+            data: Vec::new(),
+            hashes: H,
+            chunk: [0; BUFFER_SIZE_U64],
+            bytes_len: 0,
+        }
+    }
+}
+
+impl Hasher<Sha512, Generic> {
+    pub fn reader(self) -> Hasher<Sha512, WithReader> {
+        let hasher: Hasher<Sha512, WithReader> = Hasher::<Sha512, WithReader> {
+            algo: self.algo,
+            phantom: PhantomData,
+        };
+        hasher
+    }
+
+    pub fn digester(self) -> Hasher<Sha512, WithoutReader> {
+        let hasher: Hasher<Sha512, WithoutReader> = Hasher::<Sha512, WithoutReader> {
+            algo: self.algo,
+            phantom: PhantomData,
+        };
+        hasher
+    }
+}
+
 impl Sha512 {
+    pub fn new() -> Self {
+        Self {
+            data: Vec::new(),
+            hashes: H,
+            chunk: [0; BUFFER_SIZE_U64],
+            bytes_len: 0,
+        }
+    }
     fn compression(
         w: &[u64; MESSAGE_SCHEDULE_SIZE],
         (a, b, c, d, e, f, g, h): (
@@ -260,73 +298,55 @@ impl Sha512 {
     }
 }
 
-impl BufferedHasher for Sha512 {
-    fn new() -> Self {
-        Self {
-            data: Vec::new(),
-            hashes: H,
-            chunk: [0; BUFFER_SIZE_U64],
-            bytes_len: 0,
-        }
+impl Hasher<Sha512, WithReader> {
+    pub fn consumed_len(&self) -> usize {
+        self.algo.bytes_len
     }
 
-    fn consumed_len(&self) -> usize {
-        self.bytes_len
-    }
-
-    fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
+    pub fn read(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
-            self.bytes_len += n;
+            self.algo.bytes_len += n;
             if n == 0 {
                 break;
             } else if n == BUFFER_SIZE_U8 {
-                Self::copy_buf_u8_to_u64(&buffer, &mut self.chunk, 0);
-                self.hash_algo();
+                Sha512::copy_buf_u8_to_u64(&buffer, &mut self.algo.chunk, 0);
+                self.algo.hash_algo();
             } else {
                 let mut data = Vec::new();
                 for d in &buffer[..n] {
                     data.push(*d);
                 }
-                Self::add_padding(&mut data, Some(self.bytes_len));
+                Sha512::add_padding(&mut data, Some(self.algo.bytes_len));
                 for i in (0..data.len()).step_by(BUFFER_SIZE_U8) {
-                    Self::copy_buf_u8_to_u64(&data, &mut self.chunk, i);
-                    self.hash_algo();
+                    Sha512::copy_buf_u8_to_u64(&data, &mut self.algo.chunk, i);
+                    self.algo.hash_algo();
                 }
             }
         }
-        self.get_hash_string()
+        self.algo.get_hash_string()
     }
 }
 
-impl Hasher for Sha512 {
-    fn new() -> Self {
-        Self {
-            data: Vec::new(),
-            hashes: H,
-            chunk: [0; BUFFER_SIZE_U64],
-            bytes_len: 0,
-        }
+impl Hasher<Sha512, WithoutReader> {
+    pub fn consumed_len(&self) -> usize {
+        self.algo.data.len()
     }
 
-    fn consumed_len(&self) -> usize {
-        self.data.len()
-    }
-
-    fn digest(&mut self, data: &[u8]) {
+    pub fn digest(&mut self, data: &[u8]) {
         for byte in data {
-            self.data.push(*byte);
+            self.algo.data.push(*byte);
         }
     }
 
     /// Main hasher function
-    fn finish(&mut self) -> String {
-        Self::add_padding(&mut self.data, None);
+    pub fn finalize(&mut self) -> String {
+        Sha512::add_padding(&mut self.algo.data, None);
 
-        for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
-            Self::copy_buf_u8_to_u64(&self.data, &mut self.chunk, i);
-            self.hash_algo();
+        for i in (0..self.algo.data.len()).step_by(BUFFER_SIZE_U8) {
+            Sha512::copy_buf_u8_to_u64(&self.algo.data, &mut self.algo.chunk, i);
+            self.algo.hash_algo();
         }
-        self.get_hash_string()
+        self.algo.get_hash_string()
     }
 }
