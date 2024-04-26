@@ -1,4 +1,4 @@
-use crate::hashes::{Hasher,Generic, WithReader, WithoutReader};
+use crate::hashes::{Generic, Hasher, WithReader, WithoutReader};
 
 use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::{io::Read, marker::PhantomData};
@@ -111,7 +111,7 @@ const K: [u64; MESSAGE_SCHEDULE_SIZE] = [
     0x6c44198c4a475817,
 ];
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Sha512 {
     data: Vec<u8>,
     hashes: [u64; HASH_SIZE_U64],
@@ -119,18 +119,30 @@ pub struct Sha512 {
     bytes_len: usize,
 }
 
-impl Hasher<Sha512, Generic> {
+impl Default for Sha512 {
+    fn default() -> Self {
+        Self {
+            data: Vec::new(),
+            hashes: H,
+            chunk: [0; BUFFER_SIZE_U64],
+            bytes_len: 0,
+        }
+    }
+}
 
-    pub fn reader(self) -> Hasher<Sha512, WithReader>{
-        let hasher: Hasher<Sha512, WithReader> = Hasher::<Sha512, WithReader>{
-            algo: self.algo, phantom: PhantomData
+impl Hasher<Sha512, Generic> {
+    pub fn reader(self) -> Hasher<Sha512, WithReader> {
+        let hasher: Hasher<Sha512, WithReader> = Hasher::<Sha512, WithReader> {
+            algo: self.algo,
+            phantom: PhantomData,
         };
         hasher
     }
 
     fn digester(self) -> Hasher<Sha512, WithoutReader> {
-        let hasher: Hasher<Sha512, WithoutReader> = Hasher::<Sha512, WithoutReader>{
-            algo: self.algo, phantom: PhantomData
+        let hasher: Hasher<Sha512, WithoutReader> = Hasher::<Sha512, WithoutReader> {
+            algo: self.algo,
+            phantom: PhantomData,
         };
         hasher
     }
@@ -138,13 +150,12 @@ impl Hasher<Sha512, Generic> {
 
 impl Sha512 {
     pub fn new() -> Self {
-       Self {
+        Self {
             data: Vec::new(),
             hashes: H,
             chunk: [0; BUFFER_SIZE_U64],
             bytes_len: 0,
         }
-  
     }
     fn compression(
         w: &[u64; MESSAGE_SCHEDULE_SIZE],
@@ -317,7 +328,7 @@ impl Hasher<Sha512, WithReader> {
     }
 }
 
-impl Hasher<Sha512, WithoutReader>{
+impl Hasher<Sha512, WithoutReader> {
     fn consumed_len(&self) -> usize {
         self.algo.data.len()
     }

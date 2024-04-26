@@ -1,9 +1,5 @@
-use ahsah::{
-    hashes::BufferedHasher,
-    sha256::Sha256,
-    sha512::Sha512,
-};
 use ahsah::utils::{Args, HashingAlgo::*};
+use ahsah::{hashes::BufferedHasher, sha256::Sha256, sha512::Sha512};
 use clap::Parser;
 use std::{
     fs::File,

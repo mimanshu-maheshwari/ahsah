@@ -1,4 +1,4 @@
-use super::hashes::{Hasher, Generic, WithReader, WithoutReader};
+use super::hashes::{Generic, Hasher, WithReader, WithoutReader};
 use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::io::prelude::Read;
 use std::marker::PhantomData;
@@ -32,12 +32,23 @@ const K: [u32; BUFFER_SIZE_U8] = [
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 ];
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Sha256 {
     data: Vec<u8>,
     hashes: [u32; HASH_SIZE_U32],
     chunk: [u32; BUFFER_SIZE_U32],
     bytes_len: usize,
+}
+
+impl Default for Sha256 {
+    fn default() -> Self {
+        Self {
+            data: Vec::new(),
+            hashes: H,
+            bytes_len: 0,
+            chunk: [0; BUFFER_SIZE_U32],
+        }
+    }
 }
 
 impl Sha256 {
@@ -136,7 +147,7 @@ impl Sha256 {
         temp_block_buf.push((len) as u8);
     }
 
-    /// hashing algorithm 
+    /// hashing algorithm
     fn hash_algo(&mut self) {
         // initialize registers
         // message schedule array
@@ -184,22 +195,23 @@ impl Sha256 {
 }
 
 impl Hasher<Sha256, Generic> {
-
-    pub fn reader(self) -> Hasher<Sha256, WithReader>{
-        let hasher: Hasher<Sha256, WithReader> = Hasher::<Sha256, WithReader>{
-            algo: self.algo, phantom: PhantomData
+    pub fn reader(self) -> Hasher<Sha256, WithReader> {
+        let hasher: Hasher<Sha256, WithReader> = Hasher::<Sha256, WithReader> {
+            algo: self.algo,
+            phantom: PhantomData,
         };
         hasher
     }
     fn digester(self) -> Hasher<Sha256, WithoutReader> {
-        let hasher: Hasher<Sha256, WithoutReader> = Hasher::<Sha256, WithoutReader>{
-            algo: self.algo, phantom: PhantomData
+        let hasher: Hasher<Sha256, WithoutReader> = Hasher::<Sha256, WithoutReader> {
+            algo: self.algo,
+            phantom: PhantomData,
         };
         hasher
     }
 }
 
-impl Hasher<Sha256, WithReader>{
+impl Hasher<Sha256, WithReader> {
     /// the length of data that is hashed in bytes
     fn consumed_len(&self) -> usize {
         self.algo.bytes_len
@@ -232,7 +244,6 @@ impl Hasher<Sha256, WithReader>{
 }
 
 impl Hasher<Sha256, WithoutReader> {
-
     fn consumed_len(&self) -> usize {
         self.algo.data.len()
     }

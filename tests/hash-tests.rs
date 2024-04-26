@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub mod hash_tests {
-    pub mod unbuffered{
+    pub mod unbuffered {
         pub mod sha512_test {
             use ahsah::{hashes::Hasher, sha512::Sha512};
             #[test]
@@ -132,7 +132,5 @@ pub mod hash_tests {
             }
         }
     }
-    pub mod buffered {
-    }
+    pub mod buffered {}
 }
-
