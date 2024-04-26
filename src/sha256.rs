@@ -1,6 +1,7 @@
-use super::hashes::{BufferedHasher, Hasher};
+use super::hashes::{Hasher, Generic, WithReader, WithoutReader};
 use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::io::prelude::Read;
+use std::marker::PhantomData;
 
 /// Message buffer size in bits
 const BUFFER_SIZE_BITS: usize = 512;
@@ -40,6 +41,16 @@ pub struct Sha256 {
 }
 
 impl Sha256 {
+    /// create a new instance of hasher
+    pub(crate) fn new() -> Self {
+        Self {
+            data: Vec::new(),
+            hashes: H,
+            bytes_len: 0,
+            chunk: [0; BUFFER_SIZE_U32],
+        }
+    }
+
     fn compression(
         w: &[u32; MESSAGE_SCHEDULE_SIZE],
         (a, b, c, d, e, f, g, h): (
@@ -172,76 +183,74 @@ impl Sha256 {
     }
 }
 
-impl BufferedHasher for Sha256 {
-    /// create a new instance of hasher
-    fn new() -> Self {
-        Self {
-            data: Vec::new(),
-            hashes: H,
-            bytes_len: 0,
-            chunk: [0; BUFFER_SIZE_U32],
-        }
-    }
+impl Hasher<Sha256, Generic> {
 
+    pub fn reader(self) -> Hasher<Sha256, WithReader>{
+        let hasher: Hasher<Sha256, WithReader> = Hasher::<Sha256, WithReader>{
+            algo: self.algo, phantom: PhantomData
+        };
+        hasher
+    }
+    fn digester(self) -> Hasher<Sha256, WithoutReader> {
+        let hasher: Hasher<Sha256, WithoutReader> = Hasher::<Sha256, WithoutReader>{
+            algo: self.algo, phantom: PhantomData
+        };
+        hasher
+    }
+}
+
+impl Hasher<Sha256, WithReader>{
     /// the length of data that is hashed in bytes
     fn consumed_len(&self) -> usize {
-        self.bytes_len
+        self.algo.bytes_len
     }
 
     /// hashing algorithm
-    fn hash_bufferd(&mut self, handle: &mut dyn Read) -> String {
+    fn read(&mut self, handle: &mut dyn Read) -> String {
         let mut buffer = [0; BUFFER_SIZE_U8];
         while let Ok(n) = handle.read(&mut buffer) {
-            self.bytes_len += n;
+            self.algo.bytes_len += n;
             if n == 0 {
                 break;
             } else if n == BUFFER_SIZE_U8 {
-                Self::copy_buf_u8_to_u32(&buffer, &mut self.chunk, 0);
-                self.hash_algo();
+                Sha256::copy_buf_u8_to_u32(&buffer, &mut self.algo.chunk, 0);
+                self.algo.hash_algo();
             } else {
                 let mut data = Vec::new();
                 for d in &buffer[..n] {
                     data.push(*d);
                 }
-                Self::add_padding(&mut data, Some(self.bytes_len));
+                Sha256::add_padding(&mut data, Some(self.algo.bytes_len));
                 for i in (0..data.len()).step_by(BUFFER_SIZE_U8) {
-                    Self::copy_buf_u8_to_u32(&data, &mut self.chunk, i);
-                    self.hash_algo();
+                    Sha256::copy_buf_u8_to_u32(&data, &mut self.algo.chunk, i);
+                    self.algo.hash_algo();
                 }
             }
         }
-        self.get_hash_string()
+        self.algo.get_hash_string()
     }
 }
 
-impl Hasher for Sha256 {
-    fn new() -> Self {
-        Self {
-            data: Vec::new(),
-            hashes: H,
-            bytes_len: 0,
-            chunk: [0; BUFFER_SIZE_U32],
-        }
-    }
+impl Hasher<Sha256, WithoutReader> {
 
     fn consumed_len(&self) -> usize {
-        self.data.len()
+        self.algo.data.len()
     }
 
     fn digest(&mut self, data: &[u8]) {
         for byte in data {
-            self.data.push(*byte);
+            self.algo.data.push(*byte);
         }
     }
 
     /// Main hasher function
     fn finish(&mut self) -> String {
-        Self::add_padding(&mut self.data, None);
+        Sha256::add_padding(&mut self.algo.data, None);
 
-        for i in (0..self.data.len()).step_by(BUFFER_SIZE_U8) {
-            Self::copy_buf_u8_to_u32(&self.data, &mut self.chunk, i);
-            self.hash_algo();
+        for i in (0..self.algo.data.len()).step_by(BUFFER_SIZE_U8) {
+            Sha256::copy_buf_u8_to_u32(&self.algo.data, &mut self.algo.chunk, i);
+            self.algo.hash_algo();
         }
-        self.get_hash_string()
+        self.algo.get_hash_string()
     }
 }
