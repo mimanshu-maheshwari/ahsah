@@ -1,5 +1,5 @@
-use ahsah::utils::{Args, HashingAlgo::*};
 use ahsah::hashes::HashBuilder;
+use ahsah::utils::{Args, HashingAlgo::*};
 use clap::Parser;
 use std::{
     fs::File,
@@ -23,7 +23,7 @@ fn main() {
     let hash = match args.algo {
         Sha512 => HashBuilder::sha512().reader().read(&mut handle),
         Sha256 => HashBuilder::sha256().reader().read(&mut handle),
-        MD5 => unimplemented!("implement md5 hashing algo"),
+        MD5    => HashBuilder::md5()   .reader().read(&mut handle),
     };
 
     let elapsed = now.elapsed();

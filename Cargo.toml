@@ -25,25 +25,35 @@ unsafe_code = "forbid"
 # crate-type = ["lib"]
 # test = true
 
-[[test]]
-name = "hash_tests"
-path = "tests/hash-tests.rs"
+#[[test]]
+#name = "sha256_tests"
+#path = "tests/sha256_tests.rs"
+
+#[[test]]
+#name = "sha512_tests"
+#path = "tests/sha512_tests.rs"
+
+#[[test]]
+#name = "md5_tests"
+#path = "tests/md5_tests.rs"
+
 
 #[[example]]
 #name = "string_hasher"
 #path = "examples/string-hasher.rs"
-#
+
 #[[example]]
 #name = "stdin_hasher"
 #path = "examples/stdin-hasher.rs"
-#
+
 #[[example]]
 #name = "file_hasher"
 #path = "examples/file-hasher.rs"
-#
+
 #[[example]]
 #name = "reader_hasher"
 #path = "examples/reader-hasher.rs"
+
 [[example]] 
 name = "reader-hasher" 
 required-features = ["args"]

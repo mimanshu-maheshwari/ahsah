@@ -82,6 +82,15 @@ where
     right_rotate(x, a) ^ right_rotate(x, b) ^ right_shift(x, c)
 }
 
+pub(crate) fn left_rotate<T>(num: T, bits: usize) -> T
+where
+    T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,
+{
+    let bit_width = std::mem::size_of_val(&num) * 8;
+    let bits = bits % bit_width;
+    (num.clone() << (bits)) | (num.clone() >> (bit_width - bits))
+}
+
 pub(crate) fn right_rotate<T>(num: T, bits: usize) -> T
 where
     T: Shr<usize, Output = T> + Shl<usize, Output = T> + BitOr<T, Output = T> + Clone,

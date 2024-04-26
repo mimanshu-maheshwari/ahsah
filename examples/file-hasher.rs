@@ -11,9 +11,9 @@ fn main() {
     if let Some(path) = &args.file {
         let mut handle = Box::new(File::open(path).expect("Unable to open file"));
         let hash = match &args.algo {
-           HashingAlgo::Sha512 => HashBuilder::sha512().reader().read(&mut handle),
-           HashingAlgo::Sha256 => HashBuilder::sha256().reader().read(&mut handle),
-           HashingAlgo::MD5 => unimplemented!("This part still needs to be implemented"),
+            HashingAlgo::Sha512 => HashBuilder::sha512().reader().read(&mut handle),
+            HashingAlgo::Sha256 => HashBuilder::sha256().reader().read(&mut handle),
+            HashingAlgo::MD5    => HashBuilder::md5()   .reader().read(&mut handle),
         };
         println!("{}", hash);
     } else {

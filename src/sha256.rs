@@ -1,5 +1,5 @@
-use super::hashes::{Generic, Hasher, WithReader, WithoutReader};
-use super::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
+use crate::hashes::{Generic, Hasher, WithReader, WithoutReader};
+use crate::utils::{ch, k_value, maj, sigma_0, sigma_1, sum_0, sum_1};
 use std::io::prelude::Read;
 use std::marker::PhantomData;
 

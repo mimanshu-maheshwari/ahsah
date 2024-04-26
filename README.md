@@ -1,7 +1,7 @@
 # AHSAH: Hashing Algorithm implementations
 
-A collection of hashing algorithms which support buffered hashing through Read trait.
-
+* A collection of hashing algorithms which support buffered hashing through Read trait.
+* In future will implement more algorithms, but currently we only have Sha256, Sha512 and MD5.
 
 ## Example: 
 > Using feature flag `args` following things can be done using clap.
@@ -94,11 +94,6 @@ ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a8
 ▶ ./reader-hasher.exe -a sha512 -f data.zip
 5dfe1446c13d7b46e59bbc78b8b72c9badc13ba6172647c451ccdf47dd2ccd15d156aa221cc8c2feb9bbb03bc6e8a7c5212e60d25d3ebbd4876ae8e96b1b7bce
 ```
-
-## Changes:
-* Use builder pattern to create and run the algorithms.
-
-> > In future will implement more algorithms, but currently we only have Sha256 and Sha512.
-
 # References: 
-* [wiki](https://en.wikipedia.org/wiki/SHA-2)
+* [SHA-2](https://en.wikipedia.org/wiki/SHA-2)
+* [MD5](https://en.wikipedia.org/wiki/MD5)
