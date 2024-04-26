@@ -23,6 +23,7 @@ fn main() {
     let hash = match args.algo {
         Sha512 => HashBuilder::sha512().reader().read(&mut handle),
         Sha256 => HashBuilder::sha256().reader().read(&mut handle),
+        MD5 => unimplemented!("implement md5 hashing algo"),
     };
 
     let elapsed = now.elapsed();

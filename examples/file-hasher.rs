@@ -1,6 +1,6 @@
 use ahsah::{
     hashes::HashBuilder,
-    utils::{Args, HashingAlgo::*},
+    utils::{Args, HashingAlgo},
 };
 
 use clap::Parser;
@@ -11,8 +11,9 @@ fn main() {
     if let Some(path) = &args.file {
         let mut handle = Box::new(File::open(path).expect("Unable to open file"));
         let hash = match &args.algo {
-            Sha512 => HashBuilder::sha512().reader().read(&mut handle),
-            Sha256 => HashBuilder::sha256().reader().read(&mut handle),
+           HashingAlgo::Sha512 => HashBuilder::sha512().reader().read(&mut handle),
+           HashingAlgo::Sha256 => HashBuilder::sha256().reader().read(&mut handle),
+           HashingAlgo::MD5 => unimplemented!("This part still needs to be implemented"),
         };
         println!("{}", hash);
     } else {
