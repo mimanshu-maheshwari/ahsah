@@ -77,6 +77,7 @@ impl MD5 {
     }
 
     fn add_padding(temp_block_buf: &mut Vec<u8>, len: Option<usize>) {
+
         // length of message in bits.
         let l = match len {
             None => temp_block_buf.len() * 8,
@@ -95,6 +96,11 @@ impl MD5 {
 
         // add message length
         Self::copy_len_to_buf(temp_block_buf, l);
+        // println!("Length: {l}");
+        // for i in temp_block_buf {
+        //     print!("{:02x} ", i);
+        // }
+        // println!("");
     }
 
     /// will copy the data of u8 vec into a array of u32.
@@ -134,16 +140,16 @@ impl MD5 {
             let mut f: u32;
             let g: u32;
             if i <= 15 {
-                f = (*b & *c) | (!*b & *d);
+                f = (*b & *c) | (!(*b) & *d);
                 g = i;
             } else if 16 <= i && i <= 31 {
-                f = (*d & *b) | (!*d & *c);
+                f = (*d & *b) | (!(*d) & *c);
                 g = ((5 * i) + 1) % 16;
             } else if 32 <= i && i <= 47 {
                 f = *b ^ *c ^ *d;
                 g = ((3 * i) + 5) % 16;
             } else {
-                f = *c ^ (*b | !*d);
+                f = *c ^ (*b | (!(*d)));
                 g = (7 * i) % 16;
             }
             f = f.wrapping_add(*a).wrapping_add(K[i as usize]).wrapping_add(w[g as usize]); // m[g] must be a 32-bit block
@@ -153,9 +159,10 @@ impl MD5 {
             *b = b.wrapping_add(left_rotate(f, S[i as usize]));
         }
     }
+
     fn hash_algo(&mut self) {
         let [mut a, mut b, mut c, mut d] = &self.hashes.clone();
-        MD5::compression(&self.chunk, (&mut a, &mut b, &mut c, &mut d));
+        Self::compression(&self.chunk, (&mut a, &mut b, &mut c, &mut d));
         self.hashes[0] = a.wrapping_add(self.hashes[0]);
         self.hashes[1] = b.wrapping_add(self.hashes[1]);
         self.hashes[2] = c.wrapping_add(self.hashes[2]);
@@ -165,7 +172,7 @@ impl MD5 {
     fn get_hash_string(&self) -> String {
         format!(
             "{:08x}{:08x}{:08x}{:08x}",
-            self.hashes[0], self.hashes[1], self.hashes[2], self.hashes[3],
+            self.hashes[0].to_le(), self.hashes[1].to_le(), self.hashes[2].to_le(), self.hashes[3].to_le(),
         )
     }
 }
