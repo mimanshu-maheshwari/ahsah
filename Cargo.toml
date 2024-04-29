@@ -25,17 +25,17 @@ unsafe_code = "forbid"
 # crate-type = ["lib"]
 # test = true
 
-#[[test]]
-#name = "sha256_tests"
-#path = "tests/sha256_tests.rs"
+[[test]]
+name = "sha256_test"
+path = "tests/sha256_test.rs"
 
-#[[test]]
-#name = "sha512_tests"
-#path = "tests/sha512_tests.rs"
+[[test]]
+name = "sha512_test"
+path = "tests/sha512_test.rs"
 
-#[[test]]
-#name = "md5_tests"
-#path = "tests/md5_tests.rs"
+[[test]]
+name = "md5_test"
+path = "tests/md5_test.rs"
 
 
 #[[example]]
