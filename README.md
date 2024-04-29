@@ -97,3 +97,4 @@ ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a8
 # References: 
 * [SHA-2](https://en.wikipedia.org/wiki/SHA-2)
 * [MD5](https://en.wikipedia.org/wiki/MD5)
+* [rfc1321](https://www.ietf.org/rfc/rfc1321.txt)

@@ -235,23 +235,23 @@ impl Sha512 {
     }
 
     fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
-        let len = len as u128;
-        temp_block_buf.push((len >> 120u128) as u8);
-        temp_block_buf.push((len >> 112u128) as u8);
-        temp_block_buf.push((len >> 104u128) as u8);
-        temp_block_buf.push((len >> 96u128) as u8);
-        temp_block_buf.push((len >> 88u128) as u8);
-        temp_block_buf.push((len >> 80u128) as u8);
-        temp_block_buf.push((len >> 72u128) as u8);
-        temp_block_buf.push((len >> 64u128) as u8);
-        temp_block_buf.push((len >> 56u128) as u8);
-        temp_block_buf.push((len >> 48u128) as u8);
-        temp_block_buf.push((len >> 40u128) as u8);
-        temp_block_buf.push((len >> 32u128) as u8);
-        temp_block_buf.push((len >> 24u128) as u8);
-        temp_block_buf.push((len >> 16u128) as u8);
-        temp_block_buf.push((len >> 8u128) as u8);
-        temp_block_buf.push(len as u8);
+        let len = (len as u128) % u128::MAX;
+        temp_block_buf.push(((len >> 120u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 112u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 104u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 96u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 88u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 80u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 72u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 64u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 56u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 48u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 40u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 32u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 24u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 16u128) & 0xff) as u8);
+        temp_block_buf.push(((len >> 8u128) & 0xff) as u8);
+        temp_block_buf.push((len & 0xff) as u8);
     }
 
     fn hash_algo(&mut self) {

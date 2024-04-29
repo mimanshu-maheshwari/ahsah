@@ -137,14 +137,15 @@ impl Sha256 {
 
     /// copy the length of data to buffer.
     fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
-        temp_block_buf.push((len >> 56) as u8);
-        temp_block_buf.push((len >> 48) as u8);
-        temp_block_buf.push((len >> 40) as u8);
-        temp_block_buf.push((len >> 32) as u8);
-        temp_block_buf.push((len >> 24) as u8);
-        temp_block_buf.push((len >> 16) as u8);
-        temp_block_buf.push((len >> 8) as u8);
-        temp_block_buf.push((len) as u8);
+        let len = len % (u64::MAX as usize);
+        temp_block_buf.push(((len >> 56) & 0xff) as u8);
+        temp_block_buf.push(((len >> 48) & 0xff) as u8);
+        temp_block_buf.push(((len >> 40) & 0xff) as u8);
+        temp_block_buf.push(((len >> 32) & 0xff) as u8);
+        temp_block_buf.push(((len >> 24) & 0xff) as u8);
+        temp_block_buf.push(((len >> 16) & 0xff) as u8);
+        temp_block_buf.push(((len >> 8) & 0xff) as u8);
+        temp_block_buf.push(((len) & 0xff) as u8);
     }
 
     /// hashing algorithm

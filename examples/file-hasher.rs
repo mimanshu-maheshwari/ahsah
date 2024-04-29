@@ -13,7 +13,7 @@ fn main() {
         let hash = match &args.algo {
             HashingAlgo::Sha512 => HashBuilder::sha512().reader().read(&mut handle),
             HashingAlgo::Sha256 => HashBuilder::sha256().reader().read(&mut handle),
-            HashingAlgo::MD5    => HashBuilder::md5()   .reader().read(&mut handle),
+            HashingAlgo::MD5 => HashBuilder::md5().reader().read(&mut handle),
         };
         println!("{}", hash);
     } else {
