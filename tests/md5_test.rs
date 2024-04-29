@@ -1,3 +1,5 @@
+#[cfg(test)]
+pub mod md5_test {
 use ahsah::hashes::HashBuilder;
 
 // MD5 test suite:
@@ -94,4 +96,5 @@ fn test_quick_brown_fox_dot() {
     hasher.digest(input);
     let actual = hasher.finalize();
     assert_eq!(expected, actual);
+}
 }
