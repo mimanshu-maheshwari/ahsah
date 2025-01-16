@@ -1,3 +1,6 @@
+![Crates.io Total Downloads](https://img.shields.io/crates/d/ahsah)
+![Crates.io Downloads (recent)](https://img.shields.io/crates/dr/ahsah)
+
 # AHSAH: Hashing Algorithm implementations
 
 * A collection of hashing algorithms which support buffered hashing through Read trait.
