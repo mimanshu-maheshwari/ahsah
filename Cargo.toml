@@ -1,14 +1,19 @@
 [package]
 name = "ahsah"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 authors = ["Mimanshu Maheshwari maheshwarimimanshu@gmail.com"]
 description = "A library of hashing functions in rust"
 repository = "https://github.com/mimanshu-maheshwari/ahsah"
-homepage =  "https://github.com/mimanshu-maheshwari/ahsah"
+homepage = "https://github.com/mimanshu-maheshwari/ahsah"
 license = "MIT OR Apache-2.0"
-keywords = ["hash", "sha", "sha256", "sha512","crypto"]
-categories = ["algorithms", "cryptography", "cryptography::cryptocurrencies", "encoding"]
+keywords = ["hash", "sha", "sha256", "sha512", "crypto"]
+categories = [
+  "algorithms",
+  "cryptography",
+  "cryptography::cryptocurrencies",
+  "encoding",
+]
 exclude = ["/notes/**", "/docs/**"]
 
 
@@ -54,8 +59,8 @@ path = "tests/md5_test.rs"
 #name = "reader_hasher"
 #path = "examples/reader-hasher.rs"
 
-[[example]] 
-name = "reader-hasher" 
+[[example]]
+name = "reader-hasher"
 required-features = ["args"]
 path = "examples/reader-hasher.rs"
 
@@ -63,5 +68,4 @@ path = "examples/reader-hasher.rs"
 args = ["dep:clap"]
 
 [dependencies]
-clap = {version = "4.5.4", features = ["derive"], optional = true}
-
+clap = { version = "4.5.4", features = ["derive"], optional = true }
