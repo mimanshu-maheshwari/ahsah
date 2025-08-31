@@ -116,24 +116,19 @@ impl MD5 {
             val = (u8_block.len() - start)
         );
         for i in 0..BUFFER_SIZE_U32 {
-            u32_block[i] = (u8_block[start + (i * 4)] as u32)
-                | (u8_block[start + (i * 4) + 1] as u32) << 8
-                | (u8_block[start + (i * 4) + 2] as u32) << 16
-                | (u8_block[start + (i * 4) + 3] as u32) << 24;
+            u32_block[i] = u32::from_le_bytes([
+                u8_block[start + (i * 4)],
+                u8_block[start + (i * 4) + 1],
+                u8_block[start + (i * 4) + 2],
+                u8_block[start + (i * 4) + 3],
+            ]);
         }
     }
 
     /// copy the length of data to buffer.
     fn copy_len_to_buf(temp_block_buf: &mut Vec<u8>, len: usize) {
-        let len = len % (u64::MAX as usize);
-        temp_block_buf.push(((len) & 0xff) as u8);
-        temp_block_buf.push(((len >> 8) & 0xff) as u8);
-        temp_block_buf.push(((len >> 16) & 0xff) as u8);
-        temp_block_buf.push(((len >> 24) & 0xff) as u8);
-        temp_block_buf.push(((len >> 32) & 0xff) as u8);
-        temp_block_buf.push(((len >> 40) & 0xff) as u8);
-        temp_block_buf.push(((len >> 48) & 0xff) as u8);
-        temp_block_buf.push(((len >> 56) & 0xff) as u8);
+        let len = len as u64;
+        temp_block_buf.extend_from_slice(&len.to_le_bytes());
     }
 
     fn compression(
@@ -248,30 +243,45 @@ impl MD5 {
     }
 
     fn get_hash_string(&self) -> String {
-        format!(
-            "{:08x}{:08x}{:08x}{:08x}",
-            self.hashes[0], self.hashes[1], self.hashes[2], self.hashes[3],
-        )
+        let mut out = String::new();
+        for h in &self.hashes {
+            out.push_str(&format!(
+                "{:02x}{:02x}{:02x}{:02x}",
+                h & 0xff,
+                (h >> 8) & 0xff,
+                (h >> 16) & 0xff,
+                (h >> 24) & 0xff,
+            ));
+        }
+        out
     }
+
+    #[inline(always)]
     fn f(x: &u32, y: &u32, z: &u32) -> u32 {
         (x & y) | (!x & z)
     }
+    #[inline(always)]
     fn g(x: &u32, y: &u32, z: &u32) -> u32 {
         (x & z) | (y & !z)
     }
+    #[inline(always)]
     fn h(x: &u32, y: &u32, z: &u32) -> u32 {
         x ^ y ^ z
     }
+    #[inline(always)]
     fn i(x: &u32, y: &u32, z: &u32) -> u32 {
         y ^ (x | !z)
     }
+    #[inline(always)]
     fn ff(a: &mut u32, b: &u32, c: &u32, d: &u32, x: u32, s: usize, ac: u32) {
         *a = a
             .wrapping_add(Self::f(b, c, d))
             .wrapping_add(x)
             .wrapping_add(ac);
         *a = left_rotate(*a, s);
+        *a = a.wrapping_add(*b);
     }
+    #[inline(always)]
     fn gg(a: &mut u32, b: &u32, c: &u32, d: &u32, x: u32, s: usize, ac: u32) {
         *a = a
             .wrapping_add(Self::g(b, c, d))
@@ -280,6 +290,7 @@ impl MD5 {
         *a = left_rotate(*a, s);
         *a = a.wrapping_add(*b);
     }
+    #[inline(always)]
     fn hh(a: &mut u32, b: &u32, c: &u32, d: &u32, x: u32, s: usize, ac: u32) {
         *a = a
             .wrapping_add(Self::h(b, c, d))
@@ -288,6 +299,7 @@ impl MD5 {
         *a = left_rotate(*a, s);
         *a = a.wrapping_add(*b);
     }
+    #[inline(always)]
     fn ii(a: &mut u32, b: &u32, c: &u32, d: &u32, x: u32, s: usize, ac: u32) {
         *a = a
             .wrapping_add(Self::i(b, c, d))
