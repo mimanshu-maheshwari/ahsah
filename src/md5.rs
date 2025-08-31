@@ -1,6 +1,7 @@
 use crate::hashes::{Generic, Hasher, WithReader, WithoutReader};
 use crate::utils::k_value;
 use crate::utils::left_rotate;
+use std::fmt::Write;
 use std::io::Read;
 use std::marker::PhantomData;
 
@@ -115,14 +116,20 @@ impl MD5 {
             "Remaining bytes in buffer are {val}, Expected {BUFFER_SIZE_U8} bytes",
             val = (u8_block.len() - start)
         );
-        for i in 0..BUFFER_SIZE_U32 {
-            u32_block[i] = u32::from_le_bytes([
-                u8_block[start + (i * 4)],
-                u8_block[start + (i * 4) + 1],
-                u8_block[start + (i * 4) + 2],
-                u8_block[start + (i * 4) + 3],
-            ]);
+        for (dst, chunk) in u32_block
+            .iter_mut()
+            .zip(u8_block[start..start + BUFFER_SIZE_U8].chunks_exact(4))
+        {
+            *dst = u32::from_le_bytes(chunk.try_into().unwrap());
         }
+        // for i in 0..BUFFER_SIZE_U32 {
+        //     u32_block[i] = u32::from_le_bytes([
+        //         u8_block[start + (i * 4)],
+        //         u8_block[start + (i * 4) + 1],
+        //         u8_block[start + (i * 4) + 2],
+        //         u8_block[start + (i * 4) + 3],
+        //     ]);
+        // }
     }
 
     /// copy the length of data to buffer.
@@ -245,13 +252,15 @@ impl MD5 {
     fn get_hash_string(&self) -> String {
         let mut out = String::new();
         for h in &self.hashes {
-            out.push_str(&format!(
+            write!(
+                &mut out,
                 "{:02x}{:02x}{:02x}{:02x}",
                 h & 0xff,
                 (h >> 8) & 0xff,
                 (h >> 16) & 0xff,
                 (h >> 24) & 0xff,
-            ));
+            )
+            .unwrap();
         }
         out
     }
@@ -344,10 +353,7 @@ impl Hasher<MD5, WithReader> {
                 MD5::copy_buf_u8_to_u32(&buffer, &mut self.algo.chunk, 0);
                 self.algo.hash_algo();
             } else {
-                let mut data = Vec::new();
-                for d in &buffer[..n] {
-                    data.push(*d);
-                }
+                let mut data = buffer[..n].to_vec();
                 MD5::add_padding(&mut data, Some(self.algo.bytes_len));
                 for i in (0..data.len()).step_by(BUFFER_SIZE_U8) {
                     MD5::copy_buf_u8_to_u32(&data, &mut self.algo.chunk, i);
@@ -373,7 +379,6 @@ impl Hasher<MD5, WithoutReader> {
     /// Main hasher function
     pub fn finalize(&mut self) -> String {
         MD5::add_padding(&mut self.algo.data, None);
-
         for i in (0..self.algo.data.len()).step_by(BUFFER_SIZE_U8) {
             // println!("INFO: i: {i}, data:{:?}", &self.algo.data[i..(i + BUFFER_SIZE_U8)]);
             MD5::copy_buf_u8_to_u32(&self.algo.data, &mut self.algo.chunk, i);
