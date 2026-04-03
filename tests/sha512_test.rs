@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub mod sha512_test {
-use ahsah::hashes::HashBuilder;
+use ahsah::HashBuilder;
 #[test]
 fn test_empty() {
     let input = b"";

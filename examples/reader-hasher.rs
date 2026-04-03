@@ -1,5 +1,5 @@
-use ahsah::hashes::HashBuilder;
-use ahsah::utils::{Args, HashingAlgo::*};
+use ahsah::HashBuilder;
+use ahsah::{Args, HashingAlgo::*};
 use clap::Parser;
 use std::{
     fs::File,

@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub mod md5_test {
-    use ahsah::hashes::HashBuilder;
+    use ahsah::HashBuilder;
 
     // MD5 test suite:
     // MD5 ("") = d41d8cd98f00b204e9800998ecf8427e

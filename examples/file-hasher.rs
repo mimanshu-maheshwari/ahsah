@@ -1,7 +1,4 @@
-use ahsah::{
-    hashes::HashBuilder,
-    utils::{Args, HashingAlgo},
-};
+use ahsah::{Args, HashBuilder, HashingAlgo};
 
 use clap::Parser;
 use std::fs::File;

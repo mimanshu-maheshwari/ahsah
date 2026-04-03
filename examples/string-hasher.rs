@@ -1,4 +1,4 @@
-use ahsah::hashes::HashBuilder;
+use ahsah::HashBuilder;
 use std::env::args;
 
 fn main() {
