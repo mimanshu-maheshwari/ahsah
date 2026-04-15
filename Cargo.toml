@@ -1,6 +1,6 @@
 [package]
 name = "ahsah"
-version = "2.1.0"
+version = "0.1.2"
 edition = "2021"
 authors = ["Mimanshu Maheshwari maheshwarimimanshu@gmail.com"]
 description = "Incremental hashing contexts for MD5 and SHA-2 with reader helpers and optional SIMD decode paths"
