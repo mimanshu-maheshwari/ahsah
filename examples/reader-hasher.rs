@@ -1,5 +1,4 @@
-use ahsah::HashBuilder;
-use ahsah::{Args, HashingAlgo::*};
+use ahsah::{update_reader, Args, Digest, HashingAlgo, Md5, Sha224, Sha256, Sha384, Sha512};
 use clap::Parser;
 use std::{
     fs::File,
@@ -21,9 +20,11 @@ fn main() {
     };
 
     let hash = match args.algo {
-        Sha512 => HashBuilder::sha512().reader().read(&mut handle),
-        Sha256 => HashBuilder::sha256().reader().read(&mut handle),
-        MD5 => HashBuilder::md5().reader().read(&mut handle),
+        HashingAlgo::Md5 => digest_reader::<Md5>(&mut handle),
+        HashingAlgo::Sha224 => digest_reader::<Sha224>(&mut handle),
+        HashingAlgo::Sha256 => digest_reader::<Sha256>(&mut handle),
+        HashingAlgo::Sha384 => digest_reader::<Sha384>(&mut handle),
+        HashingAlgo::Sha512 => digest_reader::<Sha512>(&mut handle),
     };
 
     let elapsed = now.elapsed();
@@ -37,4 +38,10 @@ fn main() {
         );
     }
     println!("{}", hash);
+}
+
+fn digest_reader<D: Digest + Default>(handle: &mut dyn Read) -> String {
+    let mut digest = D::default();
+    update_reader(&mut digest, handle).expect("Unable to hash reader input");
+    digest.finalize_hex()
 }

@@ -1,13 +1,13 @@
-use ahsah::HashBuilder;
-use std::io::stdin;
+use ahsah::{Digest, Sha256};
+use std::io;
 
 fn main() {
-    let mut hasher = HashBuilder::sha256().digester();
-    let stdin = stdin(); // We get `Stdin` here.
+    let mut hasher = Sha256::new();
+    let stdin = io::stdin();
     for line in stdin.lines() {
         let line = line.expect("Unable to read line from stdin");
-        hasher.digest(line.as_bytes());
+        hasher.update(line.as_bytes());
     }
-    println!("Hashing {} bytes.", hasher.consumed_len());
-    println!("{}", hasher.finalize());
+    println!("Hashing {} bytes.", hasher.input_size());
+    println!("{}", hasher.finalize_hex());
 }

@@ -1,20 +1,24 @@
-pub mod algo;
+//! AHSAH is a small hashing crate with incremental digest contexts,
+//! reader helpers, and compatibility shims for the older builder API.
+
+pub mod algorithms;
+mod buffer;
+#[cfg(feature = "args")]
+pub mod cli;
+pub mod digest;
+pub mod encoding;
 pub mod hasher;
-pub mod traits;
-pub(crate) mod utils;
+pub mod io;
 
-// Re-exports for convenience
-pub use algo::md5::MD5;
-pub use algo::sha256::Sha256;
-pub use algo::sha512::Sha512;
-pub use hasher::{HashBuilder, Hasher};
-pub use traits::HashAlgorithm;
+pub use algorithms::{Md5, Sha224, Sha256, Sha384, Sha512, MD5};
+#[cfg(feature = "args")]
+pub use cli::{Args, HashingAlgo};
+pub use digest::Digest;
+pub use encoding::DigestBytes;
+pub use hasher::{Generic, HashBuilder, Hasher, WithReader, WithoutReader};
+pub use io::{digest_reader, update_reader};
 
-// Re-export utils for the #[cfg(feature = "args")] types
-pub use utils::*;
-
-// Backward compatibility (deprecated)
-#[deprecated(since = "2.0.0", note = "use ahsah::hasher instead")]
+#[deprecated(since = "2.1.0", note = "use ahsah::HashBuilder instead")]
 pub mod hashes {
     pub use crate::hasher::*;
 }

@@ -1,13 +1,13 @@
 [package]
 name = "ahsah"
-version = "2.0.0"
+version = "2.1.0"
 edition = "2021"
 authors = ["Mimanshu Maheshwari maheshwarimimanshu@gmail.com"]
-description = "A library of hashing functions in rust"
+description = "Incremental hashing contexts for MD5 and SHA-2 with reader helpers and optional SIMD decode paths"
 repository = "https://github.com/mimanshu-maheshwari/ahsah"
 homepage = "https://github.com/mimanshu-maheshwari/ahsah"
 license = "MIT OR Apache-2.0"
-keywords = ["hash", "sha", "sha256", "sha512", "crypto"]
+keywords = ["hash", "sha2", "md5", "sha256", "sha512"]
 categories = [
   "algorithms",
   "cryptography",
@@ -15,20 +15,6 @@ categories = [
   "encoding",
 ]
 exclude = ["/notes/**", "/docs/**"]
-
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[lints.rust]
-unsafe_code = "forbid"
-
-# libs
-# [lib]
-# name       = "sha256" 
-# path       = "src/lib/sha256.rs"
-# doc        = true
-# crate-type = ["lib"]
-# test = true
 
 [[test]]
 name = "sha256_test"
@@ -42,30 +28,34 @@ path = "tests/sha512_test.rs"
 name = "md5_test"
 path = "tests/md5_test.rs"
 
+[[example]]
+name = "string-hasher"
+path = "examples/string-hasher.rs"
 
-#[[example]]
-#name = "string_hasher"
-#path = "examples/string-hasher.rs"
+[[example]]
+name = "stdin-hasher"
+path = "examples/stdin-hasher.rs"
 
-#[[example]]
-#name = "stdin_hasher"
-#path = "examples/stdin-hasher.rs"
-
-#[[example]]
-#name = "file_hasher"
-#path = "examples/file-hasher.rs"
-
-#[[example]]
-#name = "reader_hasher"
-#path = "examples/reader-hasher.rs"
+[[example]]
+name = "file-hasher"
+required-features = ["args"]
+path = "examples/file-hasher.rs"
 
 [[example]]
 name = "reader-hasher"
 required-features = ["args"]
 path = "examples/reader-hasher.rs"
 
+[[bench]]
+name = "digest_benchmarks"
+harness = false
+
 [features]
 args = ["dep:clap"]
+simd = []
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"], optional = true }
+
+[dev-dependencies]
+criterion = "0.8"
